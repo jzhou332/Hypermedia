@@ -12,7 +12,7 @@ public class AuthoringTool {
     JFrame frame;
 
 
-    int width = 352;
+    int width = 352;   
     int height = 288;
     private void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
         try
