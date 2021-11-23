@@ -68,7 +68,8 @@ public class AuthoringTool {
             frameNumString = String.valueOf(frameNum);
         }
 
-        String framePath = "Y:\\cs576project\\AIFilmOne\\AIFilmOne\\AIFilmOne" + frameNumString + ".rgb";
+//        String framePath = "Y:\\cs576project\\AIFilmOne\\AIFilmOne\\AIFilmOne" + frameNumString + ".rgb";
+        String framePath = "/Users/congkaizhou/Desktop/Hypermedia/AIFilmOne/AIFilmOne/AIFilmOne" + frameNumString + ".rgb";
         framePath = framePath.replace("\\", "/");
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         readImageRGB(width, height, framePath, img);
