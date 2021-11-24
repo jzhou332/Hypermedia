@@ -14,14 +14,12 @@ import java.io.RandomAccessFile;
 import static java.awt.Component.LEFT_ALIGNMENT;
 
 public class AuthoringTool {
-    JFrame frame;
+    final int width = 352;
+    final int height = 288;
+    final String rgbFileExtension = new String(".rgb");
+    Video primaryVideo = new Video();
+    Video secondaryVideo = new Video();
 
-    JButton importPrimaryBtn;
-    JButton importSecondaryBtn;
-    JButton createHyperlinkBtn;
-
-    int width = 352;   
-    int height = 288;
     private void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
         try
         {
@@ -63,10 +61,15 @@ public class AuthoringTool {
         }
     }
 
+    private void showImg(BufferedImage img, JLabel lbIm, JPanel panel, JSlider slider, Video video) {
+        panel.remove(lbIm);
+        panel.revalidate();
+        panel.repaint();
 
-    private void showImg(BufferedImage img, JLabel lbIm, JPanel panel, JSlider slider, String framePath) {
+        String videoName = video.getVideoName();
+        String videoPath = video.getVideoPath();
+        int frameNum = video.getFrameNum();
 
-        int frameNum = slider.getValue();
         String frameNumString = null;
         if (frameNum >= 1 && frameNum < 10) {
             frameNumString = "000" + String.valueOf(frameNum);
@@ -77,16 +80,10 @@ public class AuthoringTool {
         } else if (frameNum >= 1000 && frameNum < 10000) {
             frameNumString = String.valueOf(frameNum);
         }
-        if (framePath == null) {
-            framePath = "Y:\\cs576project\\AIFilmOne\\AIFilmOne\\AIFilmOne" + frameNumString + ".rgb";
-        }
+        String framePath = videoPath + "/" + videoName + frameNumString + rgbFileExtension;
 
-//        String framePath = "Y:\\cs576project\\AIFilmOne\\AIFilmOne\\AIFilmOne" + frameNumString + ".rgb";
-        String framePath = "/Users/Yueting/Desktop/Hypermedia/AIFilmOne/AIFilmOne/AIFilmOne"+frameNumString+".rgb";
-//        framePath = framePath.replace("\\", "/");
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         readImageRGB(width, height, framePath, img);
-
 
         lbIm = new JLabel(new ImageIcon(img));
 
@@ -100,16 +97,12 @@ public class AuthoringTool {
         c.gridx = 0;
         c.gridy = 1;
 
-
-
-//        panel.add(slider);
         panel.add(lbIm, c);
-//        frame.setContentPane(panel);
-
-
+        panel.revalidate();
+        panel.repaint();
     }
     private void showFrame() {
-        frame = new JFrame("Hyper-Linking Video Authoring Tool");
+        final JFrame frame = new JFrame("Hyper-Linking Video Authoring Tool");
         frame.setSize(1000, 600);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -128,15 +121,15 @@ public class AuthoringTool {
         connectButton = new JButton("Connect Video");
         saveButton = new JButton("Save File");
 
-        String labelText = "HyperLink List";
         list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));  // vertically append
         JScrollPane listScroller = new JScrollPane(list);
         listScroller.setPreferredSize(new Dimension(100, 80));
         listScroller.setAlignmentX(LEFT_ALIGNMENT);
 
         JPanel listPane = new JPanel();
         listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
-        JLabel label = new JLabel(labelText);
+        JLabel label = new JLabel(new String("HyperLink List"));
         listPane.add(label);
         listPane.add(Box.createRigidArea(new Dimension(0,1)));
         listPane.add(listScroller);
@@ -161,25 +154,18 @@ public class AuthoringTool {
         BufferedImage frameTwo = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         JLabel lbIm1 = new JLabel(new ImageIcon(frameOne));
         JLabel lbIm2 = new JLabel(new ImageIcon(frameTwo));
+        JLabel frameOneLabel = new JLabel();
+        JLabel frameTwoLabel = new JLabel();
 
         // 创建一个滑块，最小值、最大值、初始值 分别为 0、20、10
-        final JSlider slider1 = new JSlider(JSlider.HORIZONTAL,1, 9000, 1);
-        final JSlider slider2 = new JSlider(JSlider.HORIZONTAL,1, 10, 1);
+        final JSlider slider1 = new JSlider(JSlider.HORIZONTAL,1, 30, 1);
+        final JSlider slider2 = new JSlider(JSlider.HORIZONTAL,1, 30, 1);
 
-//        // 设置主刻度间隔
-//        slider1.setMajorTickSpacing(4);
-//        slider2.setMajorTickSpacing(4);
-        // 设置次刻度间隔
-//        slider1.setMinorTickSpacing(1);
-//        slider2.setMinorTickSpacing(1);
-        // 绘制 刻度 和 标签
         slider1.setPaintTicks(true);
         slider1.setPaintLabels(true);
 
-
         slider2.setPaintTicks(true);
         slider2.setPaintLabels(true);
-
 
         // 添加刻度改变监听器
         slider1.addChangeListener(new ChangeListener() {
@@ -188,106 +174,16 @@ public class AuthoringTool {
                 middlePanelLeft.removeAll();
                 middlePanelLeft.revalidate();
                 middlePanelLeft.repaint();
+
                 String primaryFrameNum = "Frame " +  slider1.getValue();
-                JLabel labelFrame1 = new JLabel(primaryFrameNum);
-                middlePanelLeft.add(labelFrame1);
+                frameOneLabel.setText(primaryFrameNum);
+                middlePanelLeft.add(frameOneLabel);
                 middlePanelLeft.add(slider1);
-                showImg(frameOne, lbIm1, middlePanelLeft, slider1);
+
+                primaryVideo.setFrameNum(slider1.getValue());
+                showImg(frameOne, lbIm1, middlePanelLeft, slider1, primaryVideo);
             }
         });
-
-        String primaryFrameNum = "Frame 1";
-        JLabel labelFrame1 = new JLabel(primaryFrameNum);
-        middlePanelLeft.add(labelFrame1);
-        middlePanelLeft.add(slider1);
-        showImg(frameOne, lbIm1, 1, middlePanelLeft, slider1);
-
-        slider2.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                middlePanelLeft.removeAll();
-                middlePanelLeft.revalidate();
-                middlePanelLeft.repaint();
-                String primaryFrameNum = "Frame " +  slider1.getValue();
-                JLabel labelFrame1 = new JLabel(primaryFrameNum);
-                middlePanelLeft.add(labelFrame1);
-                middlePanelLeft.add(slider1);
-                showImg(frameOne, lbIm1, slider1.getValue(), middlePanelLeft, slider1);
-            }
-        });
-        String primaryFrameNum = "Frame 1";
-        JLabel labelFrame1 = new JLabel(primaryFrameNum);
-        middlePanelLeft.add(labelFrame1);
-        middlePanelLeft.add(slider1);
-        showImg(frameOne, lbIm1, middlePanelLeft, slider1);
-
-        // 添加滑块到内容面板
-        panel.add(slider1);
-        panel.add(slider2);
-
-
-
-
-        importPrimaryBtn = new JButton("Import Primary video");
-        importPrimaryBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == importPrimaryBtn)
-                {
-                    JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
-                    int result = chooser.showSaveDialog(null);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        File selectedFile = chooser.getSelectedFile();
-                        String path = selectedFile.getAbsolutePath();
-                        System.out.println("Selected file path: " + path);
-                        showImg(frameOne, lbIm1, panel, slider1, path);
-                    } else if (result == JFileChooser.CANCEL_OPTION) {
-                        System.out.println("No file selected");
-                    }
-
-                }
-            }
-        });
-        panel.add(importPrimaryBtn);
-
-        importSecondaryBtn = new JButton("Import Secondary video");
-        importSecondaryBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == importSecondaryBtn)
-                {
-                    JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
-                    int result = chooser.showSaveDialog(null);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        File selectedFile = chooser.getSelectedFile();
-                        String path = selectedFile.getAbsolutePath();
-                        System.out.println("Selected file path: " + path);
-                        showImg(frameTwo, lbIm2, panel, slider2, path);
-                    } else if (result == JFileChooser.CANCEL_OPTION) {
-                        System.out.println("No file selected");
-                    }
-
-                }
-            }
-        });
-        panel.add(importSecondaryBtn);
-
-        createHyperlinkBtn = new JButton("Create new hyperlink");
-        createHyperlinkBtn.addActionListener((ActionEvent e) -> {
-            String linkNameInput;
-            String defaultLinkName = "new link";
-            linkNameInput = JOptionPane.showInputDialog(null, "Enter a link name", "Set link name", JOptionPane.OK_CANCEL_OPTION);
-            {
-                JButton newLinkBtn = new JButton(String.valueOf(linkNameInput));
-                panel.add(newLinkBtn);
-                System.out.println("New Link created: "  + String.valueOf(linkNameInput));
-            }
-        });
-        panel.add(createHyperlinkBtn);
-
-
-        frame.setContentPane(panel);
-
 
         slider2.addChangeListener(new ChangeListener() {
             @Override
@@ -295,20 +191,99 @@ public class AuthoringTool {
                 middlePanelRight.removeAll();
                 middlePanelRight.revalidate();
                 middlePanelRight.repaint();
+
                 String secondaryFrameNum = "Frame " +  slider2.getValue();
-                JLabel labelFrame2 = new JLabel(secondaryFrameNum);
-                middlePanelRight.add(labelFrame2);
+                JLabel frameTwoLabel = new JLabel(secondaryFrameNum);
+                middlePanelRight.add(frameTwoLabel);
                 middlePanelRight.add(slider2);
-                showImg(frameTwo, lbIm2, middlePanelRight, slider2);
+
+                secondaryVideo.setFrameNum(slider2.getValue());
+                showImg(frameTwo, lbIm2, middlePanelRight, slider2, secondaryVideo);
 
             }
         });
-        String secondaryFrameNum = "Frame 1";
-        JLabel labelFrame2 = new JLabel(secondaryFrameNum);
-        middlePanelRight.add(labelFrame2);
-        middlePanelRight.add(slider2);
-        showImg(frameTwo, lbIm2, middlePanelRight, slider2);
 
+        primaryVideoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == primaryVideoButton)
+                {
+                    middlePanelLeft.removeAll();
+                    middlePanelLeft.revalidate();
+                    middlePanelLeft.repaint();
+
+                    JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
+                    int result = chooser.showSaveDialog(null);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        frameOneLabel.setText("Frame 1");
+                        middlePanelLeft.add(frameOneLabel);
+                        middlePanelLeft.add(slider1);
+
+                        File selectedFile = chooser.getSelectedFile();
+                        System.out.println("Selected file path: " + selectedFile.getAbsolutePath());
+                        String videoName = parseVideoName(selectedFile.getName());
+                        int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
+                        System.out.println(videoName);
+                        System.out.println(videoFrameNum);
+                        System.out.println(selectedFile.getParent());
+                        primaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
+
+                        showImg(frameOne, lbIm1, middlePanelLeft, slider1, primaryVideo);
+                    } else if (result == JFileChooser.CANCEL_OPTION) {
+                        System.out.println("No file selected");
+                    }
+
+                }
+            }
+        });
+        topPanel.add(primaryVideoButton);
+
+        secondaryVideoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == secondaryVideoButton)
+                {
+                    middlePanelRight.removeAll();
+                    middlePanelRight.revalidate();
+                    middlePanelRight.repaint();
+
+                    JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
+                    int result = chooser.showSaveDialog(null);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        frameTwoLabel.setText("Frame 1");
+                        middlePanelRight.add(frameTwoLabel);
+                        middlePanelRight.add(slider2);
+
+                        File selectedFile = chooser.getSelectedFile();
+                        System.out.println("Selected file path: " + selectedFile.getAbsolutePath());
+                        String videoName = parseVideoName(selectedFile.getName());
+                        int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
+                        secondaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
+
+                        showImg(frameTwo, lbIm2, middlePanelRight, slider2, secondaryVideo);
+                    } else if (result == JFileChooser.CANCEL_OPTION) {
+                        System.out.println("No file selected");
+                    }
+
+                }
+            }
+        });
+        topPanel.add(secondaryVideoButton);
+
+        createLinkButton.addActionListener((ActionEvent e) -> {
+            String linkNameInput = JOptionPane.showInputDialog(null, "Enter a link name", "Set link name", JOptionPane.OK_CANCEL_OPTION);
+            {
+                if (String.valueOf(linkNameInput) == null) {
+                    JButton newLinkBtn = new JButton("new link");
+                }
+                JButton newLinkBtn = new JButton(String.valueOf(linkNameInput));
+                list.add(newLinkBtn);
+                list.revalidate();
+                list.repaint();
+                System.out.println("New Link created: "  + String.valueOf(linkNameInput));
+            }
+        });
+        topPanel.add(createLinkButton);
 
         frame.setContentPane(rootPanel);
         frame.add(topPanel, BorderLayout.NORTH);
@@ -317,6 +292,71 @@ public class AuthoringTool {
         frame.setVisible(true);
     }
 
+    private String parseVideoName(String fileName) {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        while (i < fileName.length() && Character.isLetter(fileName.charAt(i))) {
+            sb.append(fileName.charAt(i++));
+        }
+        return sb.toString();
+    }
+
+    private int parseVideoFrameNum(String fileName) {
+        int videoFrameNum = 0;
+        int i = 0;
+        while (i < fileName.length()) {
+            char cur = fileName.charAt(i);
+            if (Character.isLetter(cur) || Character.isDigit(cur) && cur == '0') {
+                i++;
+            } else {
+                break;
+            }
+        }
+        while (i < fileName.length() && fileName.charAt(i) != '.') {
+            videoFrameNum *= 10;
+            videoFrameNum += fileName.charAt(i) - '0';
+            i++;
+        }
+        return videoFrameNum;
+    }
+
+    public static class Video {
+        private String videoName;
+        private String videoPath;
+        private int frameNum;
+
+        public Video() {
+
+        }
+        public Video(String videoName, String videoPath, int frameNum) {
+            this.videoName = videoName;
+            this.frameNum = frameNum;
+            this.videoPath = videoPath;
+        }
+
+        public String getVideoName() {
+            return videoName;
+        }
+        public void setVideoName(String videoName) {
+            this.videoName = videoName;
+        }
+
+        public String getVideoPath() {
+            return videoPath;
+        }
+
+        public void setVideoPath(String videoPath) {
+            this.videoPath = videoPath;
+        }
+
+        public int getFrameNum() {
+            return frameNum;
+        }
+
+        public void setFrameNum(int frameNum) {
+            this.frameNum = frameNum;
+        }
+    }
 
     public static void main(String[] args) {
         AuthoringTool authoringTool = new AuthoringTool();
