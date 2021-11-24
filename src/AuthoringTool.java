@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import static java.awt.Component.LEFT_ALIGNMENT;
+
 public class AuthoringTool {
     JFrame frame;
 
@@ -61,6 +63,7 @@ public class AuthoringTool {
         }
     }
 
+
     private void showImg(BufferedImage img, JLabel lbIm, JPanel panel, JSlider slider, String framePath) {
         int frameNum = slider.getValue();
         String frameNumString = null;
@@ -77,8 +80,9 @@ public class AuthoringTool {
             framePath = "Y:\\cs576project\\AIFilmOne\\AIFilmOne\\AIFilmOne" + frameNumString + ".rgb";
         }
 
-//        String framePath = "/Users/congkaizhou/Desktop/Hypermedia/AIFilmOne/AIFilmOne/AIFilmOne" + frameNumString + ".rgb";
-        framePath = framePath.replace("\\", "/");
+//        String framePath = "Y:\\cs576project\\AIFilmOne\\AIFilmOne\\AIFilmOne" + frameNumString + ".rgb";
+        String framePath = "/Users/Yueting/Desktop/Hypermedia/AIFilmOne/AIFilmOne/AIFilmOne"+frameNumString+".rgb";
+//        framePath = framePath.replace("\\", "/");
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         readImageRGB(width, height, framePath, img);
 
@@ -96,76 +100,125 @@ public class AuthoringTool {
         c.gridy = 1;
 
 
-        panel.add(slider);
+
+//        panel.add(slider);
         panel.add(lbIm, c);
-        frame.setContentPane(panel);
+//        frame.setContentPane(panel);
 
 
     }
     private void showFrame() {
         frame = new JFrame("Hyper-Linking Video Authoring Tool");
-        frame.setSize(1000, 500);
+        frame.setSize(1000, 600);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        JPanel rootPanel = new JPanel();
 
-        JPanel panel = new JPanel();
+        JPanel topPanel, middlePanelLeft, middlePanelRight, list;
+        JButton primaryVideoButton, secondaryVideoButton, createLinkButton, connectButton, saveButton;
 
-        // 创建一个滑块，最小值、最大值、初始值 分别为 0、20、10
-        final JSlider slider1 = new JSlider(1, 10, 1);
+        //top panel including all buttons
+        topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.LINE_AXIS));
 
-        // 设置主刻度间隔
-        slider1.setMajorTickSpacing(4);
+        primaryVideoButton = new JButton("Load Primary Video");
+        secondaryVideoButton = new JButton("Load Secondary Video");
+        createLinkButton = new JButton("Create new hyperlink");
+        connectButton = new JButton("Connect Video");
+        saveButton = new JButton("Save File");
 
-        // 设置次刻度间隔
-        slider1.setMinorTickSpacing(1);
+        String labelText = "HyperLink List";
+        list = new JPanel();
+        JScrollPane listScroller = new JScrollPane(list);
+        listScroller.setPreferredSize(new Dimension(100, 80));
+        listScroller.setAlignmentX(LEFT_ALIGNMENT);
 
-        // 绘制 刻度 和 标签
-        slider1.setPaintTicks(true);
-        slider1.setPaintLabels(true);
+        JPanel listPane = new JPanel();
+        listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
+        JLabel label = new JLabel(labelText);
+        listPane.add(label);
+        listPane.add(Box.createRigidArea(new Dimension(0,1)));
+        listPane.add(listScroller);
+        listPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-        // 创建一个滑块，最小值、最大值、初始值 分别为 0、20、10
-        final JSlider slider2 = new JSlider(1, 10, 1);
+        topPanel.add(primaryVideoButton);
+        topPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        topPanel.add(secondaryVideoButton);
+        topPanel.add(createLinkButton);
+        topPanel.add(listPane);
+        topPanel.add(connectButton);
+        topPanel.add(saveButton);
+        topPanel.add(Box.createRigidArea(new Dimension(5, 0)));
 
-        // 设置主刻度间隔
-        slider2.setMajorTickSpacing(4);
-
-        // 设置次刻度间隔
-        slider2.setMinorTickSpacing(1);
-
-        // 绘制 刻度 和 标签
-        slider2.setPaintTicks(true);
-        slider2.setPaintLabels(true);
-
-
-
-        GridBagLayout gLayout = new GridBagLayout();
-        frame.getContentPane().setLayout(gLayout);
+        //main panel including two input sliders' information
+        middlePanelLeft = new JPanel();
+        middlePanelLeft.setLayout(new BoxLayout(middlePanelLeft, BoxLayout.PAGE_AXIS));
+        middlePanelRight = new JPanel();
+        middlePanelRight.setLayout(new BoxLayout(middlePanelRight, BoxLayout.PAGE_AXIS));
 
         BufferedImage frameOne = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         BufferedImage frameTwo = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         JLabel lbIm1 = new JLabel(new ImageIcon(frameOne));
         JLabel lbIm2 = new JLabel(new ImageIcon(frameTwo));
 
+        // 创建一个滑块，最小值、最大值、初始值 分别为 0、20、10
+        final JSlider slider1 = new JSlider(JSlider.HORIZONTAL,1, 9000, 1);
+        final JSlider slider2 = new JSlider(JSlider.HORIZONTAL,1, 10, 1);
+
+//        // 设置主刻度间隔
+//        slider1.setMajorTickSpacing(4);
+//        slider2.setMajorTickSpacing(4);
+        // 设置次刻度间隔
+//        slider1.setMinorTickSpacing(1);
+//        slider2.setMinorTickSpacing(1);
+        // 绘制 刻度 和 标签
+        slider1.setPaintTicks(true);
+        slider1.setPaintLabels(true);
+
+
+        slider2.setPaintTicks(true);
+        slider2.setPaintLabels(true);
+
 
         // 添加刻度改变监听器
         slider1.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                System.out.println("slider1的当前值: " + slider1.getValue());
-                panel.removeAll();
-                showImg(frameOne, lbIm1, panel, slider1, null);
+                middlePanelLeft.removeAll();
+                middlePanelLeft.revalidate();
+                middlePanelLeft.repaint();
+                String primaryFrameNum = "Frame " +  slider1.getValue();
+                JLabel labelFrame1 = new JLabel(primaryFrameNum);
+                middlePanelLeft.add(labelFrame1);
+                middlePanelLeft.add(slider1);
+                showImg(frameOne, lbIm1, slider1.getValue(), middlePanelLeft, slider1);
             }
         });
+
+        String primaryFrameNum = "Frame 1";
+        JLabel labelFrame1 = new JLabel(primaryFrameNum);
+        middlePanelLeft.add(labelFrame1);
+        middlePanelLeft.add(slider1);
+        showImg(frameOne, lbIm1, 1, middlePanelLeft, slider1);
 
         slider2.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                System.out.println("slider1的当前值: " + slider2.getValue());
-                panel.removeAll();
-                showImg(frameTwo, lbIm2, panel, slider2, null);
+                middlePanelLeft.removeAll();
+                middlePanelLeft.revalidate();
+                middlePanelLeft.repaint();
+                String primaryFrameNum = "Frame " +  slider1.getValue();
+                JLabel labelFrame1 = new JLabel(primaryFrameNum);
+                middlePanelLeft.add(labelFrame1);
+                middlePanelLeft.add(slider1);
+                showImg(frameOne, lbIm1, slider1.getValue(), middlePanelLeft, slider1);
             }
         });
-
+        String primaryFrameNum = "Frame 1";
+        JLabel labelFrame1 = new JLabel(primaryFrameNum);
+        middlePanelLeft.add(labelFrame1);
+        middlePanelLeft.add(slider1);
+        showImg(frameOne, lbIm1, 1, middlePanelLeft, slider1);
 
         // 添加滑块到内容面板
         panel.add(slider1);
@@ -232,16 +285,36 @@ public class AuthoringTool {
         panel.add(createHyperlinkBtn);
 
 
-
-
-
-
-
         frame.setContentPane(panel);
 
+
+        slider2.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                middlePanelRight.removeAll();
+                middlePanelRight.revalidate();
+                middlePanelRight.repaint();
+                String secondaryFrameNum = "Frame " +  slider2.getValue();
+                JLabel labelFrame2 = new JLabel(secondaryFrameNum);
+                middlePanelRight.add(labelFrame2);
+                middlePanelRight.add(slider2);
+                showImg(frameTwo, lbIm2, slider2.getValue(), middlePanelRight, slider2);
+
+            }
+        });
+        String secondaryFrameNum = "Frame 1";
+        JLabel labelFrame2 = new JLabel(secondaryFrameNum);
+        middlePanelRight.add(labelFrame2);
+        middlePanelRight.add(slider2);
+        showImg(frameTwo, lbIm2, 1, middlePanelRight, slider2);
+
+
+        frame.setContentPane(rootPanel);
+        frame.add(topPanel, BorderLayout.NORTH);
+        frame.add(middlePanelLeft,BorderLayout.WEST);
+        frame.add(middlePanelRight,BorderLayout.EAST);
         frame.setVisible(true);
     }
-
 
 
     public static void main(String[] args) {
