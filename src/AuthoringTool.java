@@ -65,6 +65,7 @@ public class AuthoringTool {
 
 
     private void showImg(BufferedImage img, JLabel lbIm, JPanel panel, JSlider slider, String framePath) {
+
         int frameNum = slider.getValue();
         String frameNumString = null;
         if (frameNum >= 1 && frameNum < 10) {
@@ -191,7 +192,7 @@ public class AuthoringTool {
                 JLabel labelFrame1 = new JLabel(primaryFrameNum);
                 middlePanelLeft.add(labelFrame1);
                 middlePanelLeft.add(slider1);
-                showImg(frameOne, lbIm1, slider1.getValue(), middlePanelLeft, slider1);
+                showImg(frameOne, lbIm1, middlePanelLeft, slider1);
             }
         });
 
@@ -218,7 +219,7 @@ public class AuthoringTool {
         JLabel labelFrame1 = new JLabel(primaryFrameNum);
         middlePanelLeft.add(labelFrame1);
         middlePanelLeft.add(slider1);
-        showImg(frameOne, lbIm1, 1, middlePanelLeft, slider1);
+        showImg(frameOne, lbIm1, middlePanelLeft, slider1);
 
         // 添加滑块到内容面板
         panel.add(slider1);
@@ -298,7 +299,7 @@ public class AuthoringTool {
                 JLabel labelFrame2 = new JLabel(secondaryFrameNum);
                 middlePanelRight.add(labelFrame2);
                 middlePanelRight.add(slider2);
-                showImg(frameTwo, lbIm2, slider2.getValue(), middlePanelRight, slider2);
+                showImg(frameTwo, lbIm2, middlePanelRight, slider2);
 
             }
         });
@@ -306,7 +307,7 @@ public class AuthoringTool {
         JLabel labelFrame2 = new JLabel(secondaryFrameNum);
         middlePanelRight.add(labelFrame2);
         middlePanelRight.add(slider2);
-        showImg(frameTwo, lbIm2, 1, middlePanelRight, slider2);
+        showImg(frameTwo, lbIm2, middlePanelRight, slider2);
 
 
         frame.setContentPane(rootPanel);
