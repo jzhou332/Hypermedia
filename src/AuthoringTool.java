@@ -108,7 +108,7 @@ public class AuthoringTool {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         JPanel rootPanel = new JPanel();
 
-        JPanel topPanel, middlePanelLeft, middlePanelRight, list;
+        JPanel topPanel, middlePanel, middlePanelLeft, middlePanelRight, list;
         JButton primaryVideoButton, secondaryVideoButton, createLinkButton, connectButton, saveButton;
 
         //top panel including all buttons
@@ -147,8 +147,18 @@ public class AuthoringTool {
         //main panel including two input sliders' information
         middlePanelLeft = new JPanel();
         middlePanelLeft.setLayout(new BoxLayout(middlePanelLeft, BoxLayout.PAGE_AXIS));
+        middlePanelLeft.setPreferredSize(new Dimension(420, 350));
+//        middlePanelLeft.setBackground(Color.black);
+
         middlePanelRight = new JPanel();
         middlePanelRight.setLayout(new BoxLayout(middlePanelRight, BoxLayout.PAGE_AXIS));
+        middlePanelRight.setPreferredSize(new Dimension(420, 350));
+//        middlePanelRight.setBackground(Color.red);
+
+        middlePanel = new JPanel(new GridLayout(1, 2));
+        middlePanel.add(middlePanelLeft);
+        middlePanel.add(middlePanelRight);
+
 
         BufferedImage frameOne = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         BufferedImage frameTwo = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -236,7 +246,6 @@ public class AuthoringTool {
                 }
             }
         });
-        topPanel.add(primaryVideoButton);
 
         secondaryVideoButton.addActionListener(new ActionListener() {
             @Override
@@ -268,7 +277,6 @@ public class AuthoringTool {
                 }
             }
         });
-        topPanel.add(secondaryVideoButton);
 
         createLinkButton.addActionListener((ActionEvent e) -> {
             String linkNameInput = JOptionPane.showInputDialog(null, "Enter a link name", "Set link name", JOptionPane.OK_CANCEL_OPTION);
@@ -283,12 +291,10 @@ public class AuthoringTool {
                 System.out.println("New Link created: "  + String.valueOf(linkNameInput));
             }
         });
-        topPanel.add(createLinkButton);
 
         frame.setContentPane(rootPanel);
         frame.add(topPanel, BorderLayout.NORTH);
-        frame.add(middlePanelLeft,BorderLayout.WEST);
-        frame.add(middlePanelRight,BorderLayout.EAST);
+        frame.add(middlePanel, BorderLayout.CENTER);
         frame.setVisible(true);
     }
 
