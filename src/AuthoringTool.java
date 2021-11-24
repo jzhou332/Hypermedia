@@ -1,7 +1,10 @@
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,6 +14,9 @@ import java.io.RandomAccessFile;
 public class AuthoringTool {
     JFrame frame;
 
+    JButton importPrimaryBtn;
+    JButton importSecondaryBtn;
+    JButton createHyperlinkBtn;
 
     int width = 352;   
     int height = 288;
@@ -55,8 +61,8 @@ public class AuthoringTool {
         }
     }
 
-    private void showImg(BufferedImage img, JLabel lbIm, int frameNum, JPanel panel, JSlider slider1) {
-
+    private void showImg(BufferedImage img, JLabel lbIm, JPanel panel, JSlider slider, String framePath) {
+        int frameNum = slider.getValue();
         String frameNumString = null;
         if (frameNum >= 1 && frameNum < 10) {
             frameNumString = "000" + String.valueOf(frameNum);
@@ -67,9 +73,11 @@ public class AuthoringTool {
         } else if (frameNum >= 1000 && frameNum < 10000) {
             frameNumString = String.valueOf(frameNum);
         }
+        if (framePath == null) {
+            framePath = "Y:\\cs576project\\AIFilmOne\\AIFilmOne\\AIFilmOne" + frameNumString + ".rgb";
+        }
 
-//        String framePath = "Y:\\cs576project\\AIFilmOne\\AIFilmOne\\AIFilmOne" + frameNumString + ".rgb";
-        String framePath = "/Users/congkaizhou/Desktop/Hypermedia/AIFilmOne/AIFilmOne/AIFilmOne" + frameNumString + ".rgb";
+//        String framePath = "/Users/congkaizhou/Desktop/Hypermedia/AIFilmOne/AIFilmOne/AIFilmOne" + frameNumString + ".rgb";
         framePath = framePath.replace("\\", "/");
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         readImageRGB(width, height, framePath, img);
@@ -88,7 +96,7 @@ public class AuthoringTool {
         c.gridy = 1;
 
 
-        panel.add(slider1);
+        panel.add(slider);
         panel.add(lbIm, c);
         frame.setContentPane(panel);
 
@@ -115,6 +123,19 @@ public class AuthoringTool {
         slider1.setPaintTicks(true);
         slider1.setPaintLabels(true);
 
+        // 创建一个滑块，最小值、最大值、初始值 分别为 0、20、10
+        final JSlider slider2 = new JSlider(1, 10, 1);
+
+        // 设置主刻度间隔
+        slider2.setMajorTickSpacing(4);
+
+        // 设置次刻度间隔
+        slider2.setMinorTickSpacing(1);
+
+        // 绘制 刻度 和 标签
+        slider2.setPaintTicks(true);
+        slider2.setPaintLabels(true);
+
 
 
         GridBagLayout gLayout = new GridBagLayout();
@@ -132,17 +153,96 @@ public class AuthoringTool {
             public void stateChanged(ChangeEvent e) {
                 System.out.println("slider1的当前值: " + slider1.getValue());
                 panel.removeAll();
-                showImg(frameOne, lbIm1, slider1.getValue(), panel, slider1);
+                showImg(frameOne, lbIm1, panel, slider1, null);
             }
         });
 
-        showImg(frameOne, lbIm1, 1, panel, slider1);
+        slider2.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                System.out.println("slider1的当前值: " + slider2.getValue());
+                panel.removeAll();
+                showImg(frameTwo, lbIm2, panel, slider2, null);
+            }
+        });
+
+
         // 添加滑块到内容面板
         panel.add(slider1);
+        panel.add(slider2);
+
+
+
+
+        importPrimaryBtn = new JButton("Import Primary video");
+        importPrimaryBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == importPrimaryBtn)
+                {
+                    JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
+                    int result = chooser.showSaveDialog(null);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = chooser.getSelectedFile();
+                        String path = selectedFile.getAbsolutePath();
+                        System.out.println("Selected file path: " + path);
+                        showImg(frameOne, lbIm1, panel, slider1, path);
+                    } else if (result == JFileChooser.CANCEL_OPTION) {
+                        System.out.println("No file selected");
+                    }
+
+                }
+            }
+        });
+        panel.add(importPrimaryBtn);
+
+        importSecondaryBtn = new JButton("Import Secondary video");
+        importSecondaryBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == importSecondaryBtn)
+                {
+                    JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
+                    int result = chooser.showSaveDialog(null);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = chooser.getSelectedFile();
+                        String path = selectedFile.getAbsolutePath();
+                        System.out.println("Selected file path: " + path);
+                        showImg(frameTwo, lbIm2, panel, slider2, path);
+                    } else if (result == JFileChooser.CANCEL_OPTION) {
+                        System.out.println("No file selected");
+                    }
+
+                }
+            }
+        });
+        panel.add(importSecondaryBtn);
+
+        createHyperlinkBtn = new JButton("Create new hyperlink");
+        createHyperlinkBtn.addActionListener((ActionEvent e) -> {
+            String linkNameInput;
+            String defaultLinkName = "new link";
+            linkNameInput = JOptionPane.showInputDialog(null, "Enter a link name", "Set link name", JOptionPane.OK_CANCEL_OPTION);
+            {
+                JButton newLinkBtn = new JButton(String.valueOf(linkNameInput));
+                panel.add(newLinkBtn);
+                System.out.println("New Link created: "  + String.valueOf(linkNameInput));
+            }
+        });
+        panel.add(createHyperlinkBtn);
+
+
+
+
+
+
+
         frame.setContentPane(panel);
 
         frame.setVisible(true);
     }
+
+
 
     public static void main(String[] args) {
         AuthoringTool authoringTool = new AuthoringTool();
