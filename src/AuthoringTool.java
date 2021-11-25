@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.awt.Component.LEFT_ALIGNMENT;
 
@@ -19,7 +22,10 @@ public class AuthoringTool {
     final String rgbFileExtension = new String(".rgb");
     Video primaryVideo = new Video();
     Video secondaryVideo = new Video();
+    Map<Integer, ArrayList<Rect>> primaryVideoLinkmapper = new HashMap<>();
+    Map<Integer, ArrayList<Rect>> secondaryVideoLinkmapper = new HashMap<>();
 
+    // from csci576 hw1 start code
     private void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
         try
         {
@@ -108,7 +114,8 @@ public class AuthoringTool {
         JPanel rootPanel = new JPanel();
 
         JPanel topPanel, list, middlePanel, middlePanelLeft, middlePanelRight;
-        JPanel middleVideoPanelLeft, middleSliderPanelLeft, middleVideoPanelRight, middleSliderPanelRight;
+        MouseMotionEvents middleVideoPanelLeft, middleVideoPanelRight;
+        JPanel middleSliderPanelLeft, middleSliderPanelRight;
         JButton primaryVideoButton, secondaryVideoButton, createLinkButton, connectButton, saveButton;
 
         //top panel including all buttons
@@ -148,7 +155,7 @@ public class AuthoringTool {
         middlePanelLeft = new JPanel();
         middlePanelLeft.setLayout(new BoxLayout(middlePanelLeft, BoxLayout.Y_AXIS));
         middlePanelLeft.setPreferredSize(new Dimension(420, 350));
-        middleVideoPanelLeft = new JPanel();
+        middleVideoPanelLeft = new MouseMotionEvents(primaryVideo, primaryVideoLinkmapper);
         middleSliderPanelLeft = new JPanel();
         middlePanelLeft.add(middleSliderPanelLeft);
         middlePanelLeft.add(middleVideoPanelLeft);
@@ -158,7 +165,7 @@ public class AuthoringTool {
         middlePanelRight.setLayout(new BoxLayout(middlePanelRight, BoxLayout.Y_AXIS));
         middlePanelRight.setPreferredSize(new Dimension(420, 350));
         middleSliderPanelRight = new JPanel();
-        middleVideoPanelRight = new JPanel();
+        middleVideoPanelRight = new MouseMotionEvents(secondaryVideo, secondaryVideoLinkmapper);
         middlePanelRight.add(middleSliderPanelRight);
         middlePanelRight.add(middleVideoPanelRight);
 
@@ -234,13 +241,16 @@ public class AuthoringTool {
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
                         File selectedFile = chooser.getSelectedFile();
-                        System.out.println("Selected file path: " + selectedFile.getAbsolutePath());
+                        System.out.println("Selected primary video file path: " + selectedFile.getAbsolutePath());
                         String videoName = parseVideoName(selectedFile.getName());
                         int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
                         primaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
 
+                        primaryVideoLinkmapper = new HashMap<>();
+
                         middleSliderPanelLeft.add(frameOneLabel);
                         frameOneLabel.setText("Frame " + videoFrameNum);
+
                         middleSliderPanelLeft.add(slider1);
                         slider1.setValue(videoFrameNum);
 
@@ -269,11 +279,11 @@ public class AuthoringTool {
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
                         File selectedFile = chooser.getSelectedFile();
-                        System.out.println("Selected file path: " + selectedFile.getAbsolutePath());
+                        System.out.println("Selected secondary video file path: " + selectedFile.getAbsolutePath());
                         String videoName = parseVideoName(selectedFile.getName());
                         int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
                         secondaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
-
+                        secondaryVideoLinkmapper = new HashMap<>();
                         middleSliderPanelRight.add(frameTwoLabel);
                         frameTwoLabel.setText("Frame " + videoFrameNum);
                         middleSliderPanelRight.add(slider2);
