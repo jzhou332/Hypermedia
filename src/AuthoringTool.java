@@ -225,9 +225,7 @@ public class AuthoringTool {
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
-                        frameOneLabel.setText("Frame 1");
-                        middlePanelLeft.add(frameOneLabel);
-                        middlePanelLeft.add(slider1);
+
 
                         File selectedFile = chooser.getSelectedFile();
                         System.out.println("Selected file path: " + selectedFile.getAbsolutePath());
@@ -237,6 +235,12 @@ public class AuthoringTool {
                         System.out.println(videoFrameNum);
                         System.out.println(selectedFile.getParent());
                         primaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
+
+                        frameOneLabel.setText("Frame " + videoFrameNum);
+                        middlePanelLeft.add(frameOneLabel);
+                        
+                        middlePanelLeft.add(slider1);
+                        slider1.setValue(videoFrameNum);
 
                         showImg(frameOne, lbIm1, middlePanelLeft, slider1, primaryVideo);
                     } else if (result == JFileChooser.CANCEL_OPTION) {
@@ -259,15 +263,18 @@ public class AuthoringTool {
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
-                        frameTwoLabel.setText("Frame 1");
-                        middlePanelRight.add(frameTwoLabel);
-                        middlePanelRight.add(slider2);
+
 
                         File selectedFile = chooser.getSelectedFile();
                         System.out.println("Selected file path: " + selectedFile.getAbsolutePath());
                         String videoName = parseVideoName(selectedFile.getName());
                         int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
                         secondaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
+                        frameTwoLabel.setText("Frame " + videoFrameNum);
+                        middlePanelRight.add(frameTwoLabel);
+
+                        middlePanelRight.add(slider2);
+                        slider2.setValue(videoFrameNum);
 
                         showImg(frameTwo, lbIm2, middlePanelRight, slider2, secondaryVideo);
                     } else if (result == JFileChooser.CANCEL_OPTION) {
