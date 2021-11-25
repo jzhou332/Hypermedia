@@ -62,7 +62,7 @@ public class AuthoringTool {
     }
 
     private void showImg(BufferedImage img, JLabel lbIm, JPanel panel, JSlider slider, Video video) {
-        panel.remove(lbIm);
+        panel.removeAll();
         panel.revalidate();
         panel.repaint();
 
@@ -85,7 +85,8 @@ public class AuthoringTool {
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         readImageRGB(width, height, framePath, img);
 
-        lbIm = new JLabel(new ImageIcon(img));
+        ImageIcon imageIcon = new ImageIcon(img);
+        lbIm = new JLabel(imageIcon);
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.CENTER;
@@ -98,8 +99,6 @@ public class AuthoringTool {
         c.gridy = 1;
 
         panel.add(lbIm, c);
-        panel.revalidate();
-        panel.repaint();
     }
     private void showFrame() {
         final JFrame frame = new JFrame("Hyper-Linking Video Authoring Tool");
@@ -108,7 +107,8 @@ public class AuthoringTool {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         JPanel rootPanel = new JPanel();
 
-        JPanel topPanel, middlePanel, middlePanelLeft, middlePanelRight, list;
+        JPanel topPanel, list, middlePanel, middlePanelLeft, middlePanelRight;
+        JPanel middleVideoPanelLeft, middleSliderPanelLeft, middleVideoPanelRight, middleSliderPanelRight;
         JButton primaryVideoButton, secondaryVideoButton, createLinkButton, connectButton, saveButton;
 
         //top panel including all buttons
@@ -146,14 +146,21 @@ public class AuthoringTool {
 
         //main panel including two input sliders' information
         middlePanelLeft = new JPanel();
-        middlePanelLeft.setLayout(new BoxLayout(middlePanelLeft, BoxLayout.PAGE_AXIS));
+        middlePanelLeft.setLayout(new BoxLayout(middlePanelLeft, BoxLayout.Y_AXIS));
         middlePanelLeft.setPreferredSize(new Dimension(420, 350));
-//        middlePanelLeft.setBackground(Color.black);
+        middleVideoPanelLeft = new JPanel();
+        middleSliderPanelLeft = new JPanel();
+        middlePanelLeft.add(middleSliderPanelLeft);
+        middlePanelLeft.add(middleVideoPanelLeft);
+
 
         middlePanelRight = new JPanel();
-        middlePanelRight.setLayout(new BoxLayout(middlePanelRight, BoxLayout.PAGE_AXIS));
+        middlePanelRight.setLayout(new BoxLayout(middlePanelRight, BoxLayout.Y_AXIS));
         middlePanelRight.setPreferredSize(new Dimension(420, 350));
-//        middlePanelRight.setBackground(Color.red);
+        middleSliderPanelRight = new JPanel();
+        middleVideoPanelRight = new JPanel();
+        middlePanelRight.add(middleSliderPanelRight);
+        middlePanelRight.add(middleVideoPanelRight);
 
         middlePanel = new JPanel(new GridLayout(1, 2));
         middlePanel.add(middlePanelLeft);
@@ -162,8 +169,8 @@ public class AuthoringTool {
 
         BufferedImage frameOne = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         BufferedImage frameTwo = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        JLabel lbIm1 = new JLabel(new ImageIcon(frameOne));
-        JLabel lbIm2 = new JLabel(new ImageIcon(frameTwo));
+        JLabel lbIm1 = new JLabel();
+        JLabel lbIm2 = new JLabel();
         JLabel frameOneLabel = new JLabel();
         JLabel frameTwoLabel = new JLabel();
 
@@ -181,34 +188,32 @@ public class AuthoringTool {
         slider1.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                middlePanelLeft.removeAll();
-                middlePanelLeft.revalidate();
-                middlePanelLeft.repaint();
+                middleVideoPanelLeft.removeAll();
+                middleVideoPanelLeft.revalidate();
+                middleVideoPanelLeft.repaint();
 
                 String primaryFrameNum = "Frame " +  slider1.getValue();
                 frameOneLabel.setText(primaryFrameNum);
-                middlePanelLeft.add(frameOneLabel);
-                middlePanelLeft.add(slider1);
+                slider1.setValue(slider1.getValue());
 
                 primaryVideo.setFrameNum(slider1.getValue());
-                showImg(frameOne, lbIm1, middlePanelLeft, slider1, primaryVideo);
+                showImg(frameOne, lbIm1, middleVideoPanelLeft, slider1, primaryVideo);
             }
         });
 
         slider2.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                middlePanelRight.removeAll();
-                middlePanelRight.revalidate();
-                middlePanelRight.repaint();
+                middleVideoPanelRight.removeAll();
+                middleVideoPanelRight.revalidate();
+                middleVideoPanelRight.repaint();
 
                 String secondaryFrameNum = "Frame " +  slider2.getValue();
-                JLabel frameTwoLabel = new JLabel(secondaryFrameNum);
-                middlePanelRight.add(frameTwoLabel);
-                middlePanelRight.add(slider2);
+                frameTwoLabel.setText(secondaryFrameNum);
+                slider2.setValue(slider2.getValue());
 
                 secondaryVideo.setFrameNum(slider2.getValue());
-                showImg(frameTwo, lbIm2, middlePanelRight, slider2, secondaryVideo);
+                showImg(frameTwo, lbIm2, middleVideoPanelRight, slider2, secondaryVideo);
 
             }
         });
@@ -218,31 +223,28 @@ public class AuthoringTool {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == primaryVideoButton)
                 {
-                    middlePanelLeft.removeAll();
-                    middlePanelLeft.revalidate();
-                    middlePanelLeft.repaint();
+                    middleVideoPanelLeft.removeAll();
+                    middleVideoPanelLeft.revalidate();
+                    middleVideoPanelLeft.repaint();
+                    middleSliderPanelLeft.removeAll();
+                    middleSliderPanelLeft.revalidate();
+                    middleSliderPanelLeft.repaint();
 
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
-
-
                         File selectedFile = chooser.getSelectedFile();
                         System.out.println("Selected file path: " + selectedFile.getAbsolutePath());
                         String videoName = parseVideoName(selectedFile.getName());
                         int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
-                        System.out.println(videoName);
-                        System.out.println(videoFrameNum);
-                        System.out.println(selectedFile.getParent());
                         primaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
 
+                        middleSliderPanelLeft.add(frameOneLabel);
                         frameOneLabel.setText("Frame " + videoFrameNum);
-                        middlePanelLeft.add(frameOneLabel);
-                        
-                        middlePanelLeft.add(slider1);
+                        middleSliderPanelLeft.add(slider1);
                         slider1.setValue(videoFrameNum);
 
-                        showImg(frameOne, lbIm1, middlePanelLeft, slider1, primaryVideo);
+                        showImg(frameOne, lbIm1, middleVideoPanelLeft, slider1, primaryVideo);
                     } else if (result == JFileChooser.CANCEL_OPTION) {
                         System.out.println("No file selected");
                     }
@@ -256,27 +258,28 @@ public class AuthoringTool {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == secondaryVideoButton)
                 {
-                    middlePanelRight.removeAll();
-                    middlePanelRight.revalidate();
-                    middlePanelRight.repaint();
+                    middleVideoPanelRight.removeAll();
+                    middleVideoPanelRight.revalidate();
+                    middleVideoPanelRight.repaint();
+                    middleSliderPanelRight.removeAll();
+                    middleSliderPanelRight.revalidate();
+                    middleSliderPanelRight.repaint();
 
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
-
-
                         File selectedFile = chooser.getSelectedFile();
                         System.out.println("Selected file path: " + selectedFile.getAbsolutePath());
                         String videoName = parseVideoName(selectedFile.getName());
                         int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
                         secondaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
-                        frameTwoLabel.setText("Frame " + videoFrameNum);
-                        middlePanelRight.add(frameTwoLabel);
 
-                        middlePanelRight.add(slider2);
+                        middleSliderPanelRight.add(frameTwoLabel);
+                        frameTwoLabel.setText("Frame " + videoFrameNum);
+                        middleSliderPanelRight.add(slider2);
                         slider2.setValue(videoFrameNum);
 
-                        showImg(frameTwo, lbIm2, middlePanelRight, slider2, secondaryVideo);
+                        showImg(frameTwo, lbIm2, middleVideoPanelRight, slider2, secondaryVideo);
                     } else if (result == JFileChooser.CANCEL_OPTION) {
                         System.out.println("No file selected");
                     }
