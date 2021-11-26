@@ -17,13 +17,15 @@ import java.util.Map;
 import static java.awt.Component.LEFT_ALIGNMENT;
 
 public class AuthoringTool {
+    public static int primary_frame_num = 0;
+    public static int secondary_frame_num = 0;
     final int width = 352;
     final int height = 288;
     final String rgbFileExtension = new String(".rgb");
     Video primaryVideo = new Video();
     Video secondaryVideo = new Video();
-    Map<Integer, ArrayList<Rect>> primaryVideoLinkmapper = new HashMap<>();
-    Map<Integer, ArrayList<Rect>> secondaryVideoLinkmapper = new HashMap<>();
+    public static Map<Integer, ArrayList<Rect>> primaryVideoLinkmapper = new HashMap<>();
+    public static Map<Integer, ArrayList<Rect>> secondaryVideoLinkmapper = new HashMap<>();
 
     // from csci576 hw1 start code
     private void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
@@ -155,7 +157,8 @@ public class AuthoringTool {
         middlePanelLeft = new JPanel();
         middlePanelLeft.setLayout(new BoxLayout(middlePanelLeft, BoxLayout.Y_AXIS));
         middlePanelLeft.setPreferredSize(new Dimension(420, 350));
-        middleVideoPanelLeft = new MouseMotionEvents(primaryVideo, primaryVideoLinkmapper);
+        GridBagLayout gLayout = new GridBagLayout();
+        middleVideoPanelLeft = new MouseMotionEvents(primaryVideo, gLayout);
         middleSliderPanelLeft = new JPanel();
         middlePanelLeft.add(middleSliderPanelLeft);
         middlePanelLeft.add(middleVideoPanelLeft);
@@ -165,7 +168,7 @@ public class AuthoringTool {
         middlePanelRight.setLayout(new BoxLayout(middlePanelRight, BoxLayout.Y_AXIS));
         middlePanelRight.setPreferredSize(new Dimension(420, 350));
         middleSliderPanelRight = new JPanel();
-        middleVideoPanelRight = new MouseMotionEvents(secondaryVideo, secondaryVideoLinkmapper);
+        middleVideoPanelRight = new MouseMotionEvents(secondaryVideo, gLayout);
         middlePanelRight.add(middleSliderPanelRight);
         middlePanelRight.add(middleVideoPanelRight);
 
@@ -198,7 +201,7 @@ public class AuthoringTool {
                 middleVideoPanelLeft.removeAll();
                 middleVideoPanelLeft.revalidate();
                 middleVideoPanelLeft.repaint();
-
+                primary_frame_num = slider1.getValue();
                 String primaryFrameNum = "Frame " +  slider1.getValue();
                 frameOneLabel.setText(primaryFrameNum);
                 slider1.setValue(slider1.getValue());
@@ -236,6 +239,7 @@ public class AuthoringTool {
                     middleSliderPanelLeft.removeAll();
                     middleSliderPanelLeft.revalidate();
                     middleSliderPanelLeft.repaint();
+                    primaryVideoLinkmapper = new HashMap<>();
 
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
@@ -245,7 +249,7 @@ public class AuthoringTool {
                         String videoName = parseVideoName(selectedFile.getName());
                         int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
                         primaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
-
+                        primary_frame_num = 1;
                         primaryVideoLinkmapper = new HashMap<>();
 
                         middleSliderPanelLeft.add(frameOneLabel);
@@ -288,7 +292,7 @@ public class AuthoringTool {
                         frameTwoLabel.setText("Frame " + videoFrameNum);
                         middleSliderPanelRight.add(slider2);
                         slider2.setValue(videoFrameNum);
-
+                        secondary_frame_num = 1;
                         showImg(frameTwo, lbIm2, middleVideoPanelRight, slider2, secondaryVideo);
                     } else if (result == JFileChooser.CANCEL_OPTION) {
                         System.out.println("No file selected");

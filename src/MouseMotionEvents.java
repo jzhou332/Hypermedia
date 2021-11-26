@@ -20,13 +20,14 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
     Point p;
     Point r;
     AuthoringTool.Video video;
-    Map<Integer, ArrayList<Rect>> linkmapper;
+//    Map<Integer, ArrayList<Rect>> linkmapper;
     ArrayList<Rect> list;
-    public MouseMotionEvents(AuthoringTool.Video video, Map<Integer, ArrayList<Rect>> linkmapper) {
+    public MouseMotionEvents(AuthoringTool.Video video,  LayoutManager layout) {
+        super(layout);
         addMouseListener(this);
         addMouseMotionListener(this);
         this.video = video;
-        this.linkmapper = linkmapper;
+//        this.linkmapper = linkmapper;
         // setBorder(BorderFactory.createLineBorder(Color.red));
         // setPreferredSize(new Dimension(300, 300));
     }
@@ -59,16 +60,16 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
     public void mouseReleased(MouseEvent me) {
         r = me.getPoint();
         int frameNum = video.getFrameNum();
-        if(linkmapper.get(frameNum) == null){
+        if(AuthoringTool.primaryVideoLinkmapper.get(AuthoringTool.primary_frame_num) == null){
             ArrayList<Rect> list = new ArrayList<>();
             Rect rect = new Rect(p, r);
             list.add(rect);
             rect.printPoints();
-            linkmapper.put(frameNum, list);
+            AuthoringTool.primaryVideoLinkmapper.put(AuthoringTool.primary_frame_num, list);
         }else{
-            linkmapper.get(frameNum).add(new Rect(p, r));
+            AuthoringTool.primaryVideoLinkmapper.get(AuthoringTool.primary_frame_num).add(new Rect(p, r));
         }
-
+        System.out.println("Frame number is "+AuthoringTool.primary_frame_num);
 //        System.out.println("mouseReleased: " + r.getX()+", "+r.getY());
 
         repaint();
@@ -85,41 +86,11 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
     public void paint(Graphics g) {
 
 
-        // if (p != null && r != null) {
-        //   Dimension d = getSize();
-        //   int xc = d.width / 2;
-        //   int yc = d.height / 2;
-        //   if(p.getX()-r.getX()>0 && p.getY()-r.getY()>0){
-        //     g.drawRect((int)p.getX(), (int)p.getY(), (int)(p.getX()-r.getX()), (int)(p.getY()-r.getY()));
-        //   }
-        //   if(p.getX()-r.getX()>0 && p.getY()-r.getY()<0){
-        //     g.drawRect((int)p.getX(), (int)p.getY(), (int)(p.getX()-r.getX()), (int)(-p.getY()+r.getY()));
-        //   }
-        //   if(p.getX()-r.getX()<0 && p.getY()-r.getY()>0){
-        //     g.drawRect((int)p.getX(), (int)p.getY(), (int)(-p.getX()+r.getX()), (int)(p.getY()-r.getY()));
-        //   }
-        //   if(p.getX()-r.getX()<0 && p.getY()-r.getY()<0){
-        //     g.drawRect((int)p.getX(), (int)p.getY(), (int)(-p.getX()+r.getX()), (int)(-p.getY()+r.getY()));
-        //   }
-        //   if(linkmapper.get(frameNum) != null){
-        //         for(int i = 0; i<linkmapper.get(frameNum).size()-4; i+=4){
-        //             linkmapper.get(frameNum);
-        //             if(linkmapper.get(frameNum).get(i+2)>=linkmapper.get(frameNum).get(i) && linkmapper.get(frameNum).get(i+1)<=linkmapper.get(frameNum).get(i+3)){
-        //                 int width = (int)linkmapper.get(frameNum).get(i+2)-(int)linkmapper.get(frameNum).get(i);
-        //                 int height = (int)linkmapper.get(frameNum).get(i+3)-(int)linkmapper.get(frameNum).get(i+1);
-        //                 g.drawRect((int)linkmapper.get(frameNum).get(i), (int)linkmapper.get(frameNum).get(i+1), width, height);
-        //             }
-
-        //         }
-        //     }
-
-        // }
-
         super.paint(g);
-        int frameNum = video.getFrameNum();
-        if(linkmapper.get(frameNum) != null){
-            for(int i = 0; i<linkmapper.get(frameNum).size(); i++){
-                Rect rectangle = linkmapper.get(frameNum).get(i);
+        int frameNum = AuthoringTool.primary_frame_num;
+        if(AuthoringTool.primaryVideoLinkmapper.get(frameNum) != null){
+            for(int i = 0; i<AuthoringTool.primaryVideoLinkmapper.get(frameNum).size(); i++){
+                Rect rectangle = AuthoringTool.primaryVideoLinkmapper.get(frameNum).get(i);
                 int width = Math.abs(rectangle.cor1.x - rectangle.cor2.x);
                 int height = Math.abs(rectangle.cor1.y - rectangle.cor2.y);
                 if(rectangle.cor1.x<rectangle.cor2.x && rectangle.cor1.y<rectangle.cor2.y){
