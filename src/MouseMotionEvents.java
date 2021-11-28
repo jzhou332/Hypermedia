@@ -90,6 +90,11 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
         int frameNum = AuthoringTool.primary_frame_num;
         if(AuthoringTool.primaryVideoLinkmapper.get(frameNum) != null){
             for(int i = 0; i<AuthoringTool.primaryVideoLinkmapper.get(frameNum).size(); i++){
+                if(AuthoringTool.cur_fram_num == AuthoringTool.primary_frame_num && i == (AuthoringTool.link_order_num-1)){
+                    g.setColor(Color.RED);
+                }else{
+                    g.setColor(Color.BLACK);
+                }
                 Rect rectangle = AuthoringTool.primaryVideoLinkmapper.get(frameNum).get(i);
                 int width = Math.abs(rectangle.cor1.x - rectangle.cor2.x);
                 int height = Math.abs(rectangle.cor1.y - rectangle.cor2.y);
