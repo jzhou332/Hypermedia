@@ -29,8 +29,9 @@ public class AuthoringTool {
     public static Map<Integer, ArrayList<Rect>> primaryVideoLinkmapper = new HashMap<>();
     public static Map<Integer, ArrayList<Rect>> secondaryVideoLinkmapper = new HashMap<>();
     public static Map<JTextField, int[]> linkstoragemap = new HashMap<>();
-    //this hashmap stores how many links exist on each frame_num, this is used to track the orderig of adding link to a specific frame
+    //this hashmap stores how many links exist on each frame_num, this is used to track the ordering of adding link to a specific frame
     public static Map<Integer, Integer> frame_rectnum = new HashMap<>();
+
     public static int cur_fram_num = 0;
     public static int link_order_num = 0;
 
