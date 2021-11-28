@@ -3,8 +3,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,6 +28,11 @@ public class AuthoringTool {
     Video secondaryVideo = new Video();
     public static Map<Integer, ArrayList<Rect>> primaryVideoLinkmapper = new HashMap<>();
     public static Map<Integer, ArrayList<Rect>> secondaryVideoLinkmapper = new HashMap<>();
+    public static Map<JTextField, int[]> linkstoragemap = new HashMap<>();
+    //this hashmap stores how many links exist on each frame_num, this is used to track the orderig of adding link to a specific frame
+    public static Map<Integer, Integer> frame_rectnum = new HashMap<>();
+    public static int cur_fram_num = 0;
+    public static int link_order_num = 0;
 
     // from csci576 hw1 start code
     private void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
@@ -303,18 +310,61 @@ public class AuthoringTool {
         });
 
         createLinkButton.addActionListener((ActionEvent e) -> {
-            String linkNameInput = JOptionPane.showInputDialog(null, "Enter a link name", "Set link name", JOptionPane.OK_CANCEL_OPTION);
-            {
-                if (String.valueOf(linkNameInput) == null) {
-                    JButton newLinkBtn = new JButton("new link");
+            String linkNameInput = JOptionPane.showInputDialog("Enter a link name");
+                if(linkNameInput == null){
+
+                }else if (linkNameInput.length()>0) {
+
+                    JTextField newLink = new JTextField(String.valueOf(linkNameInput));
+
+                    if(frame_rectnum.get(primary_frame_num) == null){
+                        frame_rectnum.put(primary_frame_num, 1);
+                    }else{
+                        int a = frame_rectnum.get(primary_frame_num);
+                        frame_rectnum.put(primary_frame_num, a+1);
+                    }
+                    linkstoragemap.put(newLink, new int[]{primary_frame_num, (int)frame_rectnum.get(primary_frame_num)});
+                    newLink.addMouseListener(new MouseListener() {
+
+                        @Override
+                        public void mouseReleased(MouseEvent e) {// 鼠标松开
+                        }
+
+                        @Override
+                        public void mousePressed(MouseEvent e) {// 鼠标按下
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent e) {// 鼠标退出组件
+                        }
+
+                        @Override
+                        public void mouseEntered(MouseEvent e) {// 鼠标进入组件
+                        }
+
+                        @Override
+                        public void mouseClicked(MouseEvent e) {// 鼠标单击事件
+                            cur_fram_num = linkstoragemap.get(newLink)[0];
+                            link_order_num = linkstoragemap.get(newLink)[1];
+                            slider1.setValue(linkstoragemap.get(newLink)[0]);
+                            middleVideoPanelLeft.revalidate();
+                            middleVideoPanelLeft.repaint();
+
+                        }
+                    });
+
+
+
+                    list.add(newLink);
+                    list.revalidate();
+                    list.repaint();
+                    System.out.println("New Link created: "  + String.valueOf(linkNameInput));
                 }
-                JButton newLinkBtn = new JButton(String.valueOf(linkNameInput));
-                list.add(newLinkBtn);
-                list.revalidate();
-                list.repaint();
-                System.out.println("New Link created: "  + String.valueOf(linkNameInput));
-            }
+
+
         });
+        //making the button's text editable
+
 
         frame.setContentPane(rootPanel);
         frame.add(topPanel, BorderLayout.NORTH);
