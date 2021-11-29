@@ -366,6 +366,20 @@ public class AuthoringTool {
         });
         //making the button's text editable
 
+        connectButton.addActionListener((ActionEvent e) -> {
+            if(MouseMotionEvents.targetRectangle != null &&
+                    primaryVideoLinkmapper.containsKey(primaryVideo.getFrameNum())){
+                Rect targetRect = MouseMotionEvents.targetRectangle;
+                targetRect.setSecondaryFrameNum(secondaryVideo.getFrameNum());
+                targetRect.setSecondaryVideoName(secondaryVideo.getVideoName());
+                System.out.println("targetRect: " + targetRect.cor1);
+                System.out.println("targetRect: " + targetRect.cor2);
+                System.out.println("targetRect: " + targetRect.getSecondaryFrameNum());
+                System.out.println("targetRect: " + targetRect.getSecondaryVideoName());
+            }
+            MouseMotionEvents.targetRectangle = null;
+        });
+
 
         frame.setContentPane(rootPanel);
         frame.add(topPanel, BorderLayout.NORTH);

@@ -1,10 +1,35 @@
 import java.awt.Point;
+
 public class Rect implements Comparable<Rect> {
     public Point cor1;
     public Point cor2;
+    private String secondaryVideoName;
+    private int secondaryFrameNum;
+
     public Rect(Point a, Point b){
         this.cor1 = a;
         this.cor2 = b;
+    }
+
+    public void setSecondaryVideoName(String s){
+        this.secondaryVideoName = s;
+    }
+    public String getSecondaryVideoName(){
+        return secondaryVideoName;
+    }
+    public void setSecondaryFrameNum(int n){
+        this.secondaryFrameNum = n;
+    }
+    public int getSecondaryFrameNum(){
+        return secondaryFrameNum;
+    }
+
+    public boolean isInside(Point pt){
+        if((pt.getX() >= Math.min(cor1.getX(), cor2.getX()) || pt.getX() <= Math.max(cor1.getX(), cor2.getX()))
+                && (pt.getY() >= Math.min(cor1.getY(), cor2.getY()) || pt.getY() <= Math.max(cor1.getY(), cor2.getY()))){
+            return true;
+        }
+        return false;
     }
 
     @Override
