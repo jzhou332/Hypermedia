@@ -53,13 +53,43 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
 
     public void mousePressed(MouseEvent me) {
         p = me.getPoint();
-
-//        System.out.println("mousePressed: " + p.getX()+", "+p.getY());
+        //        System.out.println("mousePressed: " + p.getX()+", "+p.getY());
         // repaint();
+        double tempX = p.getX();
+        double tempY = p.getY();
+        if(tempX < 0){
+            tempX = 0;
+        }
+        if(tempY < 0){
+            tempY = 0;
+        }
+        if(tempX >= 352){
+            tempX = 352;
+        }
+        if(tempY >= 288){
+            tempY = 288;
+        }
+        p.setLocation(tempX, tempY);
+
     }
 
     public void mouseReleased(MouseEvent me) {
         r = me.getPoint();
+        double tempX = r.getX();
+        double tempY = r.getY();
+        if(tempX < 0){
+            tempX = 0;
+        }
+        if(tempY < 0){
+            tempY = 0;
+        }
+        if(tempX >= 352){
+            tempX = 352;
+        }
+        if(tempY >= 288){
+            tempY = 288;
+        }
+        r.setLocation(tempX, tempY);
         int frameNum = video.getFrameNum();
         if(AuthoringTool.primaryVideoLinkmapper.get(AuthoringTool.primary_frame_num) == null){
             ArrayList<Rect> list = new ArrayList<>();

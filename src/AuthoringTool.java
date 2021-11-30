@@ -164,19 +164,26 @@ public class AuthoringTool {
         //main panel including two input sliders' information
         middlePanelLeft = new JPanel();
         middlePanelLeft.setLayout(new BoxLayout(middlePanelLeft, BoxLayout.Y_AXIS));
-        middlePanelLeft.setPreferredSize(new Dimension(420, 350));
+        middlePanelLeft.setPreferredSize(new Dimension(352, 350));
+        middlePanelLeft.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
+
         GridBagLayout gLayout = new GridBagLayout();
         middleVideoPanelLeft = new MouseMotionEvents(primaryVideo, gLayout);
+        middleVideoPanelLeft.setPreferredSize(new Dimension(352, 288));
         middleSliderPanelLeft = new JPanel();
+        middleSliderPanelLeft.setPreferredSize(new Dimension(352, 62));
         middlePanelLeft.add(middleSliderPanelLeft);
         middlePanelLeft.add(middleVideoPanelLeft);
 
 
         middlePanelRight = new JPanel();
         middlePanelRight.setLayout(new BoxLayout(middlePanelRight, BoxLayout.Y_AXIS));
-        middlePanelRight.setPreferredSize(new Dimension(420, 350));
+        middlePanelRight.setPreferredSize(new Dimension(352, 350));
+        middlePanelRight.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));
         middleSliderPanelRight = new JPanel();
+        middleSliderPanelRight.setPreferredSize(new Dimension(352, 62));
         middleVideoPanelRight = new MouseMotionEvents(secondaryVideo, gLayout);
+        middleVideoPanelRight.setPreferredSize(new Dimension(352, 288));
         middlePanelRight.add(middleSliderPanelRight);
         middlePanelRight.add(middleVideoPanelRight);
 
@@ -379,7 +386,6 @@ public class AuthoringTool {
             }
             MouseMotionEvents.targetRectangle = null;
         });
-
 
         frame.setContentPane(rootPanel);
         frame.add(topPanel, BorderLayout.NORTH);
