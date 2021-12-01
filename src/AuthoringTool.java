@@ -8,10 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -247,7 +244,13 @@ public class AuthoringTool {
                     middleSliderPanelLeft.removeAll();
                     middleSliderPanelLeft.revalidate();
                     middleSliderPanelLeft.repaint();
+                    list.removeAll();
+                    list.revalidate();
+                    list.repaint();
+
+
                     primaryVideoLinkmapper = new HashMap<>();
+                    linkstoragemap = new HashMap<>();
 
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
@@ -258,7 +261,82 @@ public class AuthoringTool {
                         int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
                         primaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
                         primary_frame_num = 1;
-                        primaryVideoLinkmapper = new HashMap<>();
+
+                        try {
+                            FileInputStream fileIn = new FileInputStream(primaryVideo.getVideoPath() + "/primaryVideoLinkmapper.ser");
+                            ObjectInputStream in = new ObjectInputStream(fileIn);
+                            primaryVideoLinkmapper = (Map<Integer, ArrayList<Rect>>) in.readObject();
+                            in.close();
+                            fileIn.close();
+                        } catch (IOException i) {
+                            primaryVideoLinkmapper = new HashMap<>();
+                            i.printStackTrace();
+
+                        } catch (ClassNotFoundException c) {
+                            System.out.println("primaryVideoLinkmapper class not found");
+                            primaryVideoLinkmapper = new HashMap<>();
+                            c.printStackTrace();
+                        }
+
+                        try {
+                            FileInputStream fileIn = new FileInputStream(primaryVideo.getVideoPath() + "/linkstoragemap.ser");
+                            ObjectInputStream in = new ObjectInputStream(fileIn);
+                            linkstoragemap = (Map<JTextField, int[]>) in.readObject();
+                            in.close();
+                            fileIn.close();
+                            for (JTextField newLink : linkstoragemap.keySet()) {
+                                list.add(newLink);
+                                list.revalidate();
+                                list.repaint();
+
+                                // TODO: not sure if need this code block
+                                if(frame_rectnum.get(primary_frame_num) == null){
+                                    frame_rectnum.put(primary_frame_num, 1);
+                                }else{
+                                    int a = frame_rectnum.get(primary_frame_num);
+                                    frame_rectnum.put(primary_frame_num, a+1);
+                                }
+
+                                newLink.addMouseListener(new MouseListener() {
+
+                                    @Override
+                                    public void mouseReleased(MouseEvent e) {// 鼠标松开
+                                    }
+
+                                    @Override
+                                    public void mousePressed(MouseEvent e) {// 鼠标按下
+                                    }
+
+                                    @Override
+                                    public void mouseExited(MouseEvent e) {// 鼠标退出组件
+                                    }
+
+                                    @Override
+                                    public void mouseEntered(MouseEvent e) {// 鼠标进入组件
+                                    }
+
+                                    @Override
+                                    public void mouseClicked(MouseEvent e) {// 鼠标单击事件
+                                        cur_fram_num = linkstoragemap.get(newLink)[0];
+                                        link_order_num = linkstoragemap.get(newLink)[1];
+                                        slider1.setValue(linkstoragemap.get(newLink)[0]);
+                                        middleVideoPanelLeft.revalidate();
+                                        middleVideoPanelLeft.repaint();
+
+                                    }
+                                });
+                            }
+
+                        } catch (IOException i) {
+                            linkstoragemap = new HashMap<>();
+                            i.printStackTrace();
+
+                        } catch (ClassNotFoundException c) {
+                            System.out.println("linkstoragemap class not found");
+                            linkstoragemap = new HashMap<>();
+                            c.printStackTrace();
+                        }
+
 
                         middleSliderPanelLeft.add(frameOneLabel);
                         frameOneLabel.setText("Frame " + videoFrameNum);
@@ -354,8 +432,6 @@ public class AuthoringTool {
                         }
                     });
 
-
-
                     list.add(newLink);
                     list.revalidate();
                     list.repaint();
@@ -367,6 +443,10 @@ public class AuthoringTool {
         //making the button's text editable
 
         connectButton.addActionListener((ActionEvent e) -> {
+            if (secondaryVideo == null) {
+                // TODO: if we didn't upload secondary video, we should do nothing
+                return;
+            }
             if(MouseMotionEvents.targetRectangle != null &&
                     primaryVideoLinkmapper.containsKey(primaryVideo.getFrameNum())){
                 Rect targetRect = MouseMotionEvents.targetRectangle;
@@ -379,6 +459,30 @@ public class AuthoringTool {
             }
             MouseMotionEvents.targetRectangle = null;
         });
+
+        saveButton.addActionListener((ActionEvent e) -> {
+            try {
+                FileOutputStream fileOut = new FileOutputStream(primaryVideo.getVideoPath() + "/primaryVideoLinkmapper.ser");
+                ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                out.writeObject(primaryVideoLinkmapper);
+                out.close();
+                fileOut.close();
+                System.out.println("Serialized data is saved in " + primaryVideo.getVideoPath() + "/primaryVideoLinkmapper.ser");
+            } catch (IOException i) {
+                i.printStackTrace();
+            }
+            try {
+                FileOutputStream fileOut = new FileOutputStream(primaryVideo.getVideoPath() + "/linkstoragemap.ser");
+                ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                out.writeObject(linkstoragemap);
+                out.close();
+                fileOut.close();
+                System.out.println("Serialized data is saved in " + primaryVideo.getVideoPath() + "/linkstoragemap.ser");
+            } catch (IOException i) {
+                i.printStackTrace();
+            }
+        });
+
 
 
         frame.setContentPane(rootPanel);

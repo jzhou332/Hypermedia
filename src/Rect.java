@@ -1,10 +1,13 @@
 import java.awt.Point;
 
-public class Rect implements Comparable<Rect> {
+public class Rect implements Comparable<Rect>, java.io.Serializable {
     public Point cor1;
     public Point cor2;
+
     private String secondaryVideoName;
     private int secondaryFrameNum;
+
+    public boolean isOriginalFrame;
 
     public Rect(Point a, Point b){
         this.cor1 = a;
