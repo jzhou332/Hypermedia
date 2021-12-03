@@ -53,7 +53,7 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
     public void mousePressed(MouseEvent me) {
         p = me.getPoint();
 
-//        System.out.println("mousePressed: " + p.getX()+", "+p.getY());
+        System.out.println("mousePressed: " + p.getX()+", "+p.getY());
         // repaint();
     }
 
@@ -70,8 +70,8 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
             AuthoringTool.primaryVideoLinkmapper.get(AuthoringTool.primary_frame_num).add(new Rect(p, r));
         }
         System.out.println("Frame number is "+AuthoringTool.primary_frame_num);
-//        System.out.println("mouseReleased: " + r.getX()+", "+r.getY());
-
+        System.out.println("mouseReleased: " + r.getX()+", "+r.getY());
+        AuthoringTool.predictfutureRect(AuthoringTool.primary_frame_num, new Rect(p, r));
         repaint();
     }
 
