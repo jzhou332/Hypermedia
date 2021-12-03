@@ -38,6 +38,9 @@ public class AuthoringTool {
     //get the primary file path
     public static String primary_file_path = "";
 
+    //track how many rects we have created
+    public static ArrayList<Rect> rectList = new ArrayList<>();
+    public static ArrayList<Link> linkList = new ArrayList<>();
     // from csci576 hw1 start code
     private static void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
         try
@@ -90,6 +93,94 @@ public class AuthoringTool {
     }
     //this ethod will do modifications to "primaryVideoLinkmapper"
     //frameNum是调用这个方法的当前的frameNumber
+    public static void predictMiddleRect(Link a){
+        Rect start = a.start;
+        Rect end = a.end;
+        int startFrame = start.primaryFrameNum;
+        int endFrame = end.primaryFrameNum;
+
+        int upperleftX = 0;
+        int upperleftY = 0;
+        int width1 = Math.abs(start.cor1.x - start.cor2.x);
+        int height1 = Math.abs(start.cor1.y - start.cor2.y);
+        if(start.cor1.x<start.cor2.x && start.cor1.y<start.cor2.y){
+            upperleftX = start.cor1.x ;
+            upperleftY = start.cor1.y ;
+        }
+        if(start.cor1.x<start.cor2.x && start.cor1.y>start.cor2.y){
+            upperleftX = start.cor1.x ;
+            upperleftY = start.cor2.y ;
+//            g.drawRect(rectangle.cor1.x, rectangle.cor2.y, width, height);
+        }
+        if(start.cor1.x>start.cor2.x && start.cor1.y<start.cor2.y){
+            upperleftX = start.cor2.x ;
+            upperleftY = start.cor1.y ;
+//            g.drawRect(rectangle.cor2.x, rectangle.cor1.y, width, height);
+        }
+        if(start.cor1.x>start.cor2.x && start.cor1.y>start.cor2.y){
+            upperleftX = start.cor2.x ;
+            upperleftY = start.cor2.y ;
+        }
+
+        int upperleftX2 = 0;
+        int upperleftY2 = 0;
+        if(end.cor1.x<end.cor2.x && end.cor1.y<end.cor2.y){
+            upperleftX2 = end.cor1.x ;
+            upperleftY2 = end.cor1.y ;
+        }
+        if(end.cor1.x<end.cor2.x && end.cor1.y>end.cor2.y){
+            upperleftX2 = end.cor1.x ;
+            upperleftY2 = end.cor2.y ;
+//            g.drawRect(rectangle.cor1.x, rectangle.cor2.y, width, height);
+        }
+        if(end.cor1.x>end.cor2.x && end.cor1.y<end.cor2.y){
+            upperleftX2 = end.cor2.x ;
+            upperleftY2 = end.cor1.y ;
+//            g.drawRect(rectangle.cor2.x, rectangle.cor1.y, width, height);
+        }
+        if(end.cor1.x>end.cor2.x && end.cor1.y>end.cor2.y){
+            upperleftX2 = end.cor2.x ;
+            upperleftY2 = end.cor2.y ;
+        }
+        int dx = (upperleftX2 - upperleftX)/(endFrame - startFrame);
+        int dy = (upperleftY2 - upperleftY)/(endFrame - startFrame);
+
+        for(int i = startFrame+1; i<endFrame; i++){
+            BufferedImage org = new BufferedImage(352, 288, BufferedImage.TYPE_INT_RGB);
+            String OrgNumString = null;
+            if (i >= 1 && i < 10) {
+                OrgNumString = "000" + String.valueOf(i);
+            } else if (i >= 10 && i < 100) {
+                OrgNumString = "00" + String.valueOf(i);
+            } else if (i >= 100 && i < 1000) {
+                OrgNumString = "0" + String.valueOf(i);
+            } else if (i >= 1000 && i < 10000) {
+                OrgNumString = String.valueOf(i);
+            }
+            String orgpath = primary_file_path + OrgNumString + ".rgb";
+            readImageRGB(352, 288, orgpath, org);
+            if(primaryVideoLinkmapper.get(i) == null){
+                upperleftX = upperleftX + dx;
+                upperleftY = upperleftY + dy;
+                ArrayList<Rect> list = new ArrayList<>();
+                Point s  = new Point(upperleftX, upperleftY);
+                Point e  = new Point(upperleftX+width1, upperleftY+height1);
+                Rect add = new Rect(s, e);
+                list.add(add);
+                primaryVideoLinkmapper.put(i, list);
+            }else{
+                upperleftX = upperleftX + dx;
+                upperleftY = upperleftY + dy;
+                ArrayList<Rect> list = new ArrayList<>();
+                Point s  = new Point(upperleftX, upperleftY);
+                Point e  = new Point(upperleftX+width1, upperleftY+height1);
+                Rect add = new Rect(s, e);
+                primaryVideoLinkmapper.get(i).add(add);
+            }
+        }
+
+
+    }
     public static void predictfutureRect(int framenumber, Rect rectangle){
         int frameNum = framenumber;
         //判断当前长方形的width, height, 和左上角的顶点
@@ -507,7 +598,7 @@ public class AuthoringTool {
                         int a = frame_rectnum.get(primary_frame_num);
                         frame_rectnum.put(primary_frame_num, a+1);
                     }
-                    linkstoragemap.put(newLink, new int[]{primary_frame_num, (int)frame_rectnum.get(primary_frame_num)});
+                    linkstoragemap.put(newLink, new int[]{primary_frame_num, (int)primaryVideoLinkmapper.get(primary_frame_num).size()});
                     newLink.addMouseListener(new MouseListener() {
 
                         @Override
