@@ -90,7 +90,7 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
             tempY = 288;
         }
         r.setLocation(tempX, tempY);
-        int frameNum = video.getFrameNum();
+//        int frameNum = video.getFrameNum();
         if(AuthoringTool.primaryVideoLinkmapper.get(AuthoringTool.primary_frame_num) == null){
             ArrayList<Rect> list = new ArrayList<>();
             Rect rect = new Rect(p, r);

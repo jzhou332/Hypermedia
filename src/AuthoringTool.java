@@ -377,7 +377,8 @@ public class AuthoringTool {
         JPanel rootPanel = new JPanel();
 
         JPanel topPanel, list, middlePanel, middlePanelLeft, middlePanelRight;
-        MouseMotionEvents middleVideoPanelLeft, middleVideoPanelRight;
+        MouseMotionEvents middleVideoPanelLeft;
+        JPanel middleVideoPanelRight;
         JPanel middleSliderPanelLeft, middleSliderPanelRight;
         JButton primaryVideoButton, secondaryVideoButton, createLinkButton, connectButton, saveButton;
 
@@ -437,7 +438,7 @@ public class AuthoringTool {
         middleSliderPanelRight = new JPanel();
         middleSliderPanelRight.setPreferredSize(new Dimension(352, 62));
         
-        middleVideoPanelRight = new MouseMotionEvents(secondaryVideo, gLayout);
+        middleVideoPanelRight = new MouseMotionEvents(gLayout);
         middleVideoPanelRight.setPreferredSize(new Dimension(352, 288));
 
         middlePanelRight.add(middleSliderPanelRight);
@@ -563,14 +564,6 @@ public class AuthoringTool {
                                 list.add(newLink);
                                 list.revalidate();
                                 list.repaint();
-
-                                // TODO: not sure if need this code block
-                                if(frame_rectnum.get(primary_frame_num) == null){
-                                    frame_rectnum.put(primary_frame_num, 1);
-                                }else{
-                                    int a = frame_rectnum.get(primary_frame_num);
-                                    frame_rectnum.put(primary_frame_num, a+1);
-                                }
 
                                 newLink.addMouseListener(new MouseListener() {
 
