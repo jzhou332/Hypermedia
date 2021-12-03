@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.awt.Point;
 
 import static java.awt.Component.LEFT_ALIGNMENT;
 
@@ -27,13 +28,18 @@ public class AuthoringTool {
     public static Map<Integer, ArrayList<Rect>> secondaryVideoLinkmapper = new HashMap<>();
     public static Map<JTextField, int[]> linkstoragemap = new HashMap<>();
     //this hashmap stores how many links exist on each frame_num, this is used to track the ordering of adding link to a specific frame
-    public static Map<Integer, Integer> frame_rectnum = new HashMap<>();
+//    public static Map<Integer, Integer> frame_rectnum = new HashMap<>();
 
     public static int cur_fram_num = 0;
     public static int link_order_num = 0;
+    //get the primary file path
+    public static String primary_file_path = "";
 
+    //track how many rects we have created
+    public static ArrayList<Rect> rectList = new ArrayList<>();
+    public static ArrayList<Link> linkList = new ArrayList<>();
     // from csci576 hw1 start code
-    private void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
+    private static void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
         try
         {
             int frameLength = width*height*3;
@@ -72,6 +78,256 @@ public class AuthoringTool {
         {
             e.printStackTrace();
         }
+    }
+
+    public static double rgbToY(int pixel){
+        double r1 = (pixel>>16)&0xff;
+        double g1 = (pixel>>8)&0xff;
+        double b1 = pixel & 0xff;
+        double y = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
+
+        return y;
+    }
+    //this ethod will do modifications to "primaryVideoLinkmapper"
+    //frameNum是调用这个方法的当前的frameNumber
+    public static void predictMiddleRect(Link a){
+        Rect start = a.start;
+        Rect end = a.end;
+        int startFrame = start.primaryFrameNum;
+        int endFrame = end.primaryFrameNum;
+
+        int upperleftX = 0;
+        int upperleftY = 0;
+        int width1 = Math.abs(start.cor1.x - start.cor2.x);
+        int height1 = Math.abs(start.cor1.y - start.cor2.y);
+        if(start.cor1.x<start.cor2.x && start.cor1.y<start.cor2.y){
+            upperleftX = start.cor1.x ;
+            upperleftY = start.cor1.y ;
+        }
+        if(start.cor1.x<start.cor2.x && start.cor1.y>start.cor2.y){
+            upperleftX = start.cor1.x ;
+            upperleftY = start.cor2.y ;
+//            g.drawRect(rectangle.cor1.x, rectangle.cor2.y, width, height);
+        }
+        if(start.cor1.x>start.cor2.x && start.cor1.y<start.cor2.y){
+            upperleftX = start.cor2.x ;
+            upperleftY = start.cor1.y ;
+//            g.drawRect(rectangle.cor2.x, rectangle.cor1.y, width, height);
+        }
+        if(start.cor1.x>start.cor2.x && start.cor1.y>start.cor2.y){
+            upperleftX = start.cor2.x ;
+            upperleftY = start.cor2.y ;
+        }
+
+        int upperleftX2 = 0;
+        int upperleftY2 = 0;
+        if(end.cor1.x<end.cor2.x && end.cor1.y<end.cor2.y){
+            upperleftX2 = end.cor1.x ;
+            upperleftY2 = end.cor1.y ;
+        }
+        if(end.cor1.x<end.cor2.x && end.cor1.y>end.cor2.y){
+            upperleftX2 = end.cor1.x ;
+            upperleftY2 = end.cor2.y ;
+//            g.drawRect(rectangle.cor1.x, rectangle.cor2.y, width, height);
+        }
+        if(end.cor1.x>end.cor2.x && end.cor1.y<end.cor2.y){
+            upperleftX2 = end.cor2.x ;
+            upperleftY2 = end.cor1.y ;
+//            g.drawRect(rectangle.cor2.x, rectangle.cor1.y, width, height);
+        }
+        if(end.cor1.x>end.cor2.x && end.cor1.y>end.cor2.y){
+            upperleftX2 = end.cor2.x ;
+            upperleftY2 = end.cor2.y ;
+        }
+        int dx = (upperleftX2 - upperleftX)/(endFrame - startFrame);
+        int dy = (upperleftY2 - upperleftY)/(endFrame - startFrame);
+
+        for(int i = startFrame+1; i<endFrame; i++){
+            BufferedImage org = new BufferedImage(352, 288, BufferedImage.TYPE_INT_RGB);
+            String OrgNumString = null;
+            if (i >= 1 && i < 10) {
+                OrgNumString = "000" + String.valueOf(i);
+            } else if (i >= 10 && i < 100) {
+                OrgNumString = "00" + String.valueOf(i);
+            } else if (i >= 100 && i < 1000) {
+                OrgNumString = "0" + String.valueOf(i);
+            } else if (i >= 1000 && i < 10000) {
+                OrgNumString = String.valueOf(i);
+            }
+            String orgpath = primary_file_path + OrgNumString + ".rgb";
+            readImageRGB(352, 288, orgpath, org);
+            if(primaryVideoLinkmapper.get(i) == null){
+                upperleftX = upperleftX + dx;
+                upperleftY = upperleftY + dy;
+                ArrayList<Rect> list = new ArrayList<>();
+                Point s  = new Point(upperleftX, upperleftY);
+                Point e  = new Point(upperleftX+width1, upperleftY+height1);
+                Rect add = new Rect(s, e);
+                list.add(add);
+                primaryVideoLinkmapper.put(i, list);
+            }else{
+                upperleftX = upperleftX + dx;
+                upperleftY = upperleftY + dy;
+                ArrayList<Rect> list = new ArrayList<>();
+                Point s  = new Point(upperleftX, upperleftY);
+                Point e  = new Point(upperleftX+width1, upperleftY+height1);
+                Rect add = new Rect(s, e);
+                primaryVideoLinkmapper.get(i).add(add);
+            }
+        }
+
+
+    }
+    public static void predictfutureRect(int framenumber, Rect rectangle){
+        int frameNum = framenumber;
+        //判断当前长方形的width, height, 和左上角的顶点
+        int upperleftX = 0;
+        int upperleftY = 0;
+        int width1 = Math.abs(rectangle.cor1.x - rectangle.cor2.x);
+        int height1 = Math.abs(rectangle.cor1.y - rectangle.cor2.y);
+        if(rectangle.cor1.x<rectangle.cor2.x && rectangle.cor1.y<rectangle.cor2.y){
+            upperleftX = rectangle.cor1.x ;
+            upperleftY = rectangle.cor1.y ;
+        }
+        if(rectangle.cor1.x<rectangle.cor2.x && rectangle.cor1.y>rectangle.cor2.y){
+            upperleftX = rectangle.cor1.x ;
+            upperleftY = rectangle.cor2.y ;
+//            g.drawRect(rectangle.cor1.x, rectangle.cor2.y, width, height);
+        }
+        if(rectangle.cor1.x>rectangle.cor2.x && rectangle.cor1.y<rectangle.cor2.y){
+            upperleftX = rectangle.cor2.x ;
+            upperleftY = rectangle.cor1.y ;
+//            g.drawRect(rectangle.cor2.x, rectangle.cor1.y, width, height);
+        }
+        if(rectangle.cor1.x>rectangle.cor2.x && rectangle.cor1.y>rectangle.cor2.y){
+            upperleftX = rectangle.cor2.x ;
+            upperleftY = rectangle.cor2.y ;
+//            g.drawRect(rectangle.cor2.x, rectangle.cor2.y, width, height);
+        }
+        //this is the original picture where we draw a rect
+//        BufferedImage org = new BufferedImage(352, 288, BufferedImage.TYPE_INT_RGB);
+//        String OrgNumString = null;
+//        if (frameNum >= 1 && frameNum < 10) {
+//            OrgNumString = "000" + String.valueOf(frameNum);
+//        } else if (frameNum >= 10 && frameNum < 100) {
+//            OrgNumString = "00" + String.valueOf(frameNum);
+//        } else if (frameNum >= 100 && frameNum < 1000) {
+//            OrgNumString = "0" + String.valueOf(frameNum);
+//        } else if (frameNum >= 1000 && frameNum < 10000) {
+//            OrgNumString = String.valueOf(frameNum);
+//        }
+//        String orgpath = primary_file_path + OrgNumString + ".rgb";
+//        readImageRGB(352, 288, orgpath, org);
+//        BufferedImage[] imageSet = new BufferedImage[60];
+
+        for(int i = 0; i<120; i++){
+            BufferedImage org = new BufferedImage(352, 288, BufferedImage.TYPE_INT_RGB);
+            String OrgNumString = null;
+            if (frameNum >= 1 && frameNum < 10) {
+                OrgNumString = "000" + String.valueOf(frameNum);
+            } else if (frameNum >= 10 && frameNum < 100) {
+                OrgNumString = "00" + String.valueOf(frameNum);
+            } else if (frameNum >= 100 && frameNum < 1000) {
+                OrgNumString = "0" + String.valueOf(frameNum);
+            } else if (frameNum >= 1000 && frameNum < 10000) {
+                OrgNumString = String.valueOf(frameNum);
+            }
+            String orgpath = primary_file_path + OrgNumString + ".rgb";
+            readImageRGB(352, 288, orgpath, org);
+            frameNum = frameNum + 1;
+            BufferedImage bufferImg = new BufferedImage(352, 288, BufferedImage.TYPE_INT_RGB);
+            String frameNumString = null;
+            if (frameNum >= 1 && frameNum < 10) {
+                frameNumString = "000" + String.valueOf(frameNum);
+            } else if (frameNum >= 10 && frameNum < 100) {
+                frameNumString = "00" + String.valueOf(frameNum);
+            } else if (frameNum >= 100 && frameNum < 1000) {
+                frameNumString = "0" + String.valueOf(frameNum);
+            } else if (frameNum >= 1000 && frameNum < 10000) {
+                frameNumString = String.valueOf(frameNum);
+            }
+            String path = primary_file_path + frameNumString + ".rgb";
+            readImageRGB(352, 288, path, bufferImg);
+//            imageSet[i] = bufferImg;
+
+            int startX = upperleftX - 5;
+            if(startX<=0){
+                startX = 0;
+            }
+            int startY = upperleftY - 5;
+            if(startY<=0){
+                startY = 0;
+            }
+
+            int endy = startY+10;
+            int endx = startX+10;
+            if(endy>=288){
+                endy = 288;
+            }
+            if(endx>=352){
+                endx = 352;
+            }
+            boolean isBreak = false;
+            int[] coord = new int[2];
+            double min = Integer.MAX_VALUE;
+            for(int y = startY; y<endy; y++){
+                for(int x = startX; x<endx; x++){
+                    if(getdifferernce(org, bufferImg, upperleftX, upperleftY, x, y, height1, width1)<min){
+                        min = getdifferernce(org, bufferImg, upperleftX, upperleftY, x, y, height1, width1);
+                        coord[0] = x;
+                        coord[1] = y;
+                    }
+                    //if the return value is smaller than a specified value, then create a rect and store this rect
+                }
+
+            }
+            if(min<100000){
+                if(primaryVideoLinkmapper.get(frameNum) == null){
+                    upperleftX = coord[0];
+                    upperleftY = coord[1];
+                    ArrayList<Rect> list = new ArrayList<>();
+                    Point a  = new Point(coord[0], coord[1]);
+                    Point b  = new Point(coord[0]+width1, coord[1]+height1);
+                    Rect add = new Rect(a, b);
+                    list.add(add);
+                    primaryVideoLinkmapper.put(frameNum, list);
+                }else{
+                    upperleftX = coord[0];
+                    upperleftY = coord[1];
+                    Point a  = new Point(coord[0], coord[1]);
+                    Point b  = new Point(coord[0]+width1, coord[1]+height1);
+                    Rect add = new Rect(a, b);
+                    primaryVideoLinkmapper.get(frameNum).add(add);
+                }
+
+            }else{
+                break;
+            }
+        }//end for
+    }
+
+    //org代表初始添加长方形的frame， ref是后续对比的frame，
+    public static double getdifferernce(BufferedImage org, BufferedImage ref, int uppleftX, int upprightY, int searchX, int searchY, int pheight, int pwidth){
+        double ret1 = 0;
+        for(int y = 0; y<pheight; y++){
+            for(int x = 0; x<pwidth; x++){
+                double f1 = rgbToY(org.getRGB(uppleftX+x, upprightY+y));
+                double f2 = rgbToY(ref.getRGB(searchX+x, searchY+y));
+                double diff = Math.abs(f1 - f2);
+                ret1 += diff;
+            }
+        }
+
+//        int ret2 = 0;
+//        for(int y = 0; y<pheight; y++){
+//            for(int x = 0; x<pwidth; x++){
+//                int f1 = org.getRGB(uppleftX+x, upprightY+y);
+//                int f2 = ref.getRGB(searchX+x, searchY+y);
+//                int diff = Math.abs(f1 - f2);
+//                ret2 += diff;
+//            }
+//        }
+        return ret1;
     }
 
     private void showImg(BufferedImage img, JLabel lbIm, JPanel panel, JSlider slider, Video video) {
@@ -175,12 +431,15 @@ public class AuthoringTool {
 
         middlePanelRight = new JPanel();
         middlePanelRight.setLayout(new BoxLayout(middlePanelRight, BoxLayout.Y_AXIS));
+
         middlePanelRight.setPreferredSize(new Dimension(352, 350));
         middlePanelRight.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));
         middleSliderPanelRight = new JPanel();
         middleSliderPanelRight.setPreferredSize(new Dimension(352, 62));
+        
         middleVideoPanelRight = new MouseMotionEvents(secondaryVideo, gLayout);
         middleVideoPanelRight.setPreferredSize(new Dimension(352, 288));
+
         middlePanelRight.add(middleSliderPanelRight);
         middlePanelRight.add(middleVideoPanelRight);
 
@@ -197,7 +456,7 @@ public class AuthoringTool {
         JLabel frameTwoLabel = new JLabel();
 
         // 创建一个滑块，最小值、最大值、初始值 分别为 0、20、10
-        final JSlider slider1 = new JSlider(JSlider.HORIZONTAL,1, 30, 1);
+        final JSlider slider1 = new JSlider(JSlider.HORIZONTAL,1, 9000, 1);
         final JSlider slider2 = new JSlider(JSlider.HORIZONTAL,1, 30, 1);
 
         slider1.setPaintTicks(true);
@@ -265,6 +524,15 @@ public class AuthoringTool {
                         File selectedFile = chooser.getSelectedFile();
                         System.out.println("Selected primary video file path: " + selectedFile.getAbsolutePath());
                         String videoName = parseVideoName(selectedFile.getName());
+//                        primary_file_path = selectedFile.getAbsolutePath();
+                        StringBuilder filepath = new StringBuilder(selectedFile.getAbsolutePath());
+                        filepath.reverse();
+                        String temp = filepath.toString();
+                        temp = temp.substring(8);
+                        StringBuilder buffer = new StringBuilder(temp);
+                        buffer.reverse();
+                        primary_file_path = buffer.toString();
+                        System.out.println(primary_file_path);
                         int videoFrameNum = parseVideoFrameNum(selectedFile.getName());
                         primaryVideo = new Video(videoName, selectedFile.getParent(), videoFrameNum);
                         primary_frame_num = 1;
@@ -403,13 +671,13 @@ public class AuthoringTool {
 
                     JTextField newLink = new JTextField(String.valueOf(linkNameInput));
 
-                    if(frame_rectnum.get(primary_frame_num) == null){
-                        frame_rectnum.put(primary_frame_num, 1);
-                    }else{
-                        int a = frame_rectnum.get(primary_frame_num);
-                        frame_rectnum.put(primary_frame_num, a+1);
-                    }
-                    linkstoragemap.put(newLink, new int[]{primary_frame_num, (int)frame_rectnum.get(primary_frame_num)});
+//                    if(frame_rectnum.get(primary_frame_num) == null){
+//                        frame_rectnum.put(primary_frame_num, 1);
+//                    }else{
+//                        int a = frame_rectnum.get(primary_frame_num);
+//                        frame_rectnum.put(primary_frame_num, a+1);
+//                    }
+                    linkstoragemap.put(newLink, new int[]{primary_frame_num, (int)primaryVideoLinkmapper.get(primary_frame_num).size()});
                     newLink.addMouseListener(new MouseListener() {
 
                         @Override
