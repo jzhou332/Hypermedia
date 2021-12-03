@@ -31,7 +31,7 @@ public class AuthoringTool {
     public static Map<Integer, ArrayList<Rect>> secondaryVideoLinkmapper = new HashMap<>();
     public static Map<JTextField, int[]> linkstoragemap = new HashMap<>();
     //this hashmap stores how many links exist on each frame_num, this is used to track the ordering of adding link to a specific frame
-    public static Map<Integer, Integer> frame_rectnum = new HashMap<>();
+//    public static Map<Integer, Integer> frame_rectnum = new HashMap<>();
 
     public static int cur_fram_num = 0;
     public static int link_order_num = 0;
@@ -592,12 +592,12 @@ public class AuthoringTool {
 
                     JTextField newLink = new JTextField(String.valueOf(linkNameInput));
 
-                    if(frame_rectnum.get(primary_frame_num) == null){
-                        frame_rectnum.put(primary_frame_num, 1);
-                    }else{
-                        int a = frame_rectnum.get(primary_frame_num);
-                        frame_rectnum.put(primary_frame_num, a+1);
-                    }
+//                    if(frame_rectnum.get(primary_frame_num) == null){
+//                        frame_rectnum.put(primary_frame_num, 1);
+//                    }else{
+//                        int a = frame_rectnum.get(primary_frame_num);
+//                        frame_rectnum.put(primary_frame_num, a+1);
+//                    }
                     linkstoragemap.put(newLink, new int[]{primary_frame_num, (int)primaryVideoLinkmapper.get(primary_frame_num).size()});
                     newLink.addMouseListener(new MouseListener() {
 
