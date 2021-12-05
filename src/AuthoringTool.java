@@ -39,7 +39,7 @@ public class AuthoringTool {
     public static ArrayList<Rect> rectList = new ArrayList<>();
     public static ArrayList<Link> linkList = new ArrayList<>();
     // from csci576 hw1 start code
-    private static void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
+    public static void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
         try
         {
             int frameLength = width*height*3;
