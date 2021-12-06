@@ -35,21 +35,25 @@ public class Itimer_test extends JFrame {
     private javax.swing.Timer time;//声明的计数器
     private boolean istime;//用来标记自动播放 是否
 
-    public static int isPlaying = -1;
     public static SourceDataLine line = null;
+    public static SimpleAudioPlayer audioPlayer;
+    public static int isPlaying = -1;
 
     static String videoPath = "/Users/aaronwenhaoge/Downloads/AIFilmOne/AIFilmOne";
-    static String audioPath = "/Users/aaronwenhaoge/Downloads/AIFilmOne/AIFilmOne.wav";
+    static String audioPath = new String();
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        playAudio(audioPath);
+        audioPath = videoPath + ".wav";
+        System.out.println(audioPath);
+
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
 //                    Itimer_test frame = new Itimer_test("/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne");
+//                    Itimer_test frame = new Itimer_test(args[0]);
                     Itimer_test frame = new Itimer_test(videoPath);
                     frame.setVisible(true);
 
@@ -58,41 +62,16 @@ public class Itimer_test extends JFrame {
                 }
             }
         });
+
+        audioPlayer = new SimpleAudioPlayer();
+        audioPlayer.play();
     }
 
-     private static void playAudio(String filePath) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-         AudioInputStream stream = AudioSystem.getAudioInputStream(new File(filePath));
-
-         AudioFormat format = stream.getFormat();
-         if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
-             format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, format.getSampleRate(),
-                     format.getSampleSizeInBits() * 2, format.getChannels(), format.getFrameSize() * 2,
-                     format.getFrameRate(), true); // big endian
-             stream = AudioSystem.getAudioInputStream(format, stream);
-         }
-
-         SourceDataLine.Info info = new DataLine.Info(SourceDataLine.class, stream.getFormat(),
-                 ((int) stream.getFrameLength() * format.getFrameSize()));
-         line = (SourceDataLine) AudioSystem.getLine(info);
-         line.open(stream.getFormat());
-         line.stop();
-
-         int numRead = 0;
-         byte[] buf = new byte[line.getBufferSize()];
-         while ((numRead = stream.read(buf, 0, buf.length)) >= 0) {
-             int offset = 0;
-             while (offset < numRead) {
-                 offset += line.write(buf, offset, numRead - offset);
-             }
-         }
-         line.drain();
-         line.stop();
-     }
 
     /**
      * Create the frame.
      */
-    public Itimer_test(String imgdir) {
+    public Itimer_test(String imgdir) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         this.imgsdir = imgdir;
         this.istime=true;
         // String path = imgsdir;
@@ -107,7 +86,7 @@ public class Itimer_test extends JFrame {
 
                     if(true){
 //                        imgsdir = "/Users/congkaizhou/Desktop/AIFilmTwo/AIFilmTwo";
-                        imgsdir = videoPath;
+//                        imgsdir = videoPath;
                         index = 0;
                         for(int i=0;i<900;i++){
         
@@ -201,13 +180,21 @@ public class Itimer_test extends JFrame {
                     istime=true;
                 }
 
-                 isPlaying *= -1;
-                 if (isPlaying == 1) {
-                     line.start();
-                 } else {
-                     line.stop();
-                 }
-                
+                isPlaying *= -1;
+                if (isPlaying == 1) {
+                    try {
+                        audioPlayer.resumeAudio();
+                    } catch (UnsupportedAudioFileException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (LineUnavailableException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    audioPlayer.pause();
+                }
+
 
             }
         });
@@ -223,6 +210,17 @@ public class Itimer_test extends JFrame {
                 time.stop();
                 istime=true;
                 label.setIcon(img[index]);// 为label设置图片的额时需要做的是使用set.. 方法
+
+                try {
+                    isPlaying = -1;
+                    audioPlayer.stop();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedAudioFileException e) {
+                    e.printStackTrace();
+                }
             }
         });
         panel.add(btnnext);
