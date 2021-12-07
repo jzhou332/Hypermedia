@@ -13,13 +13,13 @@ public class SimpleAudioPlayer {
     Clip clip;
     // current status of clip
     String status;
-    AudioInputStream audioInputStream;
+    public  AudioInputStream audioInputStream;
 
     // constructor to initialize streams and clip
-    public SimpleAudioPlayer() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+    public SimpleAudioPlayer(String audioPath) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         // create AudioInputStream object
         audioInputStream =
-                AudioSystem.getAudioInputStream(new File(Itimer_test.audioPath));
+                AudioSystem.getAudioInputStream(new File(audioPath));
         // create clip reference
         clip = AudioSystem.getClip();
         // open audioInputStream to the clip

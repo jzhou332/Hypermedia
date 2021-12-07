@@ -26,6 +26,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Itimer_test extends JFrame {
 
@@ -54,7 +59,7 @@ public class Itimer_test extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        audioPath = parentPath + videoName + videoName + ".wav";
+        audioPath = "/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne.wav";
         System.out.println(audioPath);
 
         readFile();
@@ -64,8 +69,9 @@ public class Itimer_test extends JFrame {
                 try {
 //                    Itimer_test frame = new Itimer_test("/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne");
 //                    Itimer_test frame = new Itimer_test(args[0]);
-                    Itimer_test frame = new Itimer_test(parentPath + videoName + videoName);
+                    Itimer_test frame = new Itimer_test("/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne");
                     frame.setVisible(true);
+                    audioPlayer = new SimpleAudioPlayer(audioPath);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -73,8 +79,7 @@ public class Itimer_test extends JFrame {
             }
         });
 
-        audioPlayer = new SimpleAudioPlayer();
-        audioPlayer.play();
+
     }
 
     private static void readFile() {
@@ -138,7 +143,11 @@ public class Itimer_test extends JFrame {
                     System.out.println("Mouse at "+xx+", " + yy + " " + "at frame " + (index+1));
 
                     if(true){
-//                        imgsdir = "/Users/congkaizhou/Desktop/AIFilmTwo/AIFilmTwo";
+                        imgsdir = "/Users/congkaizhou/Desktop/AIFilmTwo/AIFilmTwo";
+                        audioPath = new String("/Users/congkaizhou/Desktop/AIFilmTwo/AIFilmTwo.wav");
+
+
+
 //                        imgsdir = videoPath;
                         index = 0;
                         for(int i=0;i<900;i++){
@@ -160,6 +169,31 @@ public class Itimer_test extends JFrame {
                             img[i] = new ImageIcon(org);
       
                         }
+                        time.stop();
+                        istime=true;
+                        label.setIcon(img[index]);
+                        try {
+                            audioPlayer.stop();
+                            isPlaying = -1;
+                        } catch (UnsupportedAudioFileException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (LineUnavailableException e) {
+                            e.printStackTrace();
+                        }
+
+                        try {
+                            isPlaying = -1;
+                            audioPlayer = new SimpleAudioPlayer(audioPath);
+                        } catch (UnsupportedAudioFileException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (LineUnavailableException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                     
                     
@@ -186,13 +220,7 @@ public class Itimer_test extends JFrame {
             this.img[i] = new ImageIcon(org);
       
       }
-        
-        // this.img = new ImageIcon[] { new ImageIcon("images/addStu.png"),
-        //         new ImageIcon("images/back.png"),
-        //         new ImageIcon("images/delstu.png"),
-        //         new ImageIcon("images/option.png"),
-        //         new ImageIcon("images/png_1.png") };
-        
+
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(300, 300, 352, 400);
@@ -253,7 +281,7 @@ public class Itimer_test extends JFrame {
         });
         panel.add(btngo);
 
-        //下一张图片的按钮事件
+        //重新开始的按钮
         JButton btnnext = new JButton("Start Over");
         btnnext.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -281,6 +309,18 @@ public class Itimer_test extends JFrame {
         label = new JLabel(this.img[0]);
         contentPane.add(label, BorderLayout.CENTER);
 
+        //new added
+//        audioInputStream =
+//                AudioSystem.getAudioInputStream(new File(audioPath));
+//        // create clip reference
+//        clip = AudioSystem.getClip();
+//        // open audioInputStream to the clip
+//        clip.open(audioInputStream);
+//        clip.loop(Clip.LOOP_CONTINUOUSLY);
+//        clip.stop();
+//        currentFrame = 0L;
+
     }
+
 
 }
