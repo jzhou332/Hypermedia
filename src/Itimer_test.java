@@ -52,7 +52,7 @@ public class Itimer_test extends JFrame {
 
     static String parentPath = "/Users/aaronwenhaoge/Downloads";
     static String videoName = "/AIFilmOne";
-    static String videoPath = "/Users/aaronwenhaoge/Downloads/AIFilmOne/AIFilmOne";
+//    static String videoPath = "/Users/aaronwenhaoge/Downloads/AIFilmOne/AIFilmOne";
     static String audioPath = new String();
 
     /**
@@ -100,8 +100,14 @@ public class Itimer_test extends JFrame {
                     rect.printPoints();
                 }
             }
-        } catch(Exception e) {
+        }  catch (IOException i) {
+            primaryVideoLinkmapper = new HashMap<>();
+            i.printStackTrace();
 
+        } catch (ClassNotFoundException c) {
+            System.out.println("primaryVideoLinkmapper class not found");
+            primaryVideoLinkmapper = new HashMap<>();
+            c.printStackTrace();
         }
 
         try {
@@ -121,8 +127,14 @@ public class Itimer_test extends JFrame {
 //                }
 //                System.out.println();
 //            }
-        } catch(Exception e) {
+        } catch (IOException i) {
+            linkstoragemap = new HashMap<>();
+            i.printStackTrace();
 
+        } catch (ClassNotFoundException c) {
+            System.out.println("linkstoragemap class not found");
+            linkstoragemap = new HashMap<>();
+            c.printStackTrace();
         }
     }
 

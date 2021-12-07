@@ -105,10 +105,11 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
         AuthoringTool.rectList.add(rect);
 
         if(AuthoringTool.rectList.size()%2 == 0 && AuthoringTool.rectList.size()>0){
-            for(int i = 0; i<AuthoringTool.rectList.size(); i+=2){
-                AuthoringTool.linkList.add(new Link(AuthoringTool.rectList.get(i), AuthoringTool.rectList.get(i+1)));
-                AuthoringTool.predictMiddleRect(new Link(AuthoringTool.rectList.get(i), AuthoringTool.rectList.get(i+1)));
-            }
+//            for(int i = 0; i<; i+=2)
+                int i = AuthoringTool.rectList.size();
+                AuthoringTool.linkList.add(new Link(AuthoringTool.rectList.get(i-2), AuthoringTool.rectList.get(i-1)));
+                AuthoringTool.predictMiddleRect(new Link(AuthoringTool.rectList.get(i-2), AuthoringTool.rectList.get(i-1)));
+
         }
         System.out.println("Frame number is "+AuthoringTool.primary_frame_num);
 //        System.out.println("mouseReleased: " + r.getX()+", "+r.getY());
