@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.awt.Point;
 
@@ -38,6 +39,10 @@ public class AuthoringTool {
     //track how many rects we have created
     public static ArrayList<Rect> rectList = new ArrayList<>();
     public static ArrayList<Link> linkList = new ArrayList<>();
+
+    //save the generate predicted Rectangle to the hashmap inorder to set the corresponding secondary video when connectVideoBtn clicked
+    public static Map<String,ArrayList<Rect>> predictedRectMap = new HashMap<>();
+
     // from csci576 hw1 start code
     public static void readImageRGB(int width, int height, String imgPath, BufferedImage img) {
         try
@@ -93,6 +98,16 @@ public class AuthoringTool {
     public static void predictMiddleRect(Link a){
         Rect start = a.start;
         Rect end = a.end;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(start.cor1);
+        sb.append(start.cor2);
+        String startRectInfo = sb.toString();
+
+        predictedRectMap.put(startRectInfo, new ArrayList<>());
+        predictedRectMap.get(startRectInfo).add(start);
+        predictedRectMap.get(startRectInfo).add(end);
+
         int startFrame = start.primaryFrameNum;
         int endFrame = end.primaryFrameNum;
 
@@ -165,6 +180,7 @@ public class AuthoringTool {
                 Rect add = new Rect(s, e);
                 list.add(add);
                 primaryVideoLinkmapper.put(i, list);
+                predictedRectMap.get(startRectInfo).add(add);
             }else{
                 upperleftX = upperleftX + dx;
                 upperleftY = upperleftY + dy;
@@ -173,9 +189,9 @@ public class AuthoringTool {
                 Point e  = new Point(upperleftX+width1, upperleftY+height1);
                 Rect add = new Rect(s, e);
                 primaryVideoLinkmapper.get(i).add(add);
+                predictedRectMap.get(startRectInfo).add(add);
             }
         }
-
 
     }
     public static void predictfutureRect(int framenumber, Rect rectangle){
@@ -671,6 +687,7 @@ public class AuthoringTool {
 //                        frame_rectnum.put(primary_frame_num, a+1);
 //                    }
                     linkstoragemap.put(newLink, new int[]{primary_frame_num, (int)primaryVideoLinkmapper.get(primary_frame_num).size()});
+
                     newLink.addMouseListener(new MouseListener() {
 
                         @Override
@@ -718,12 +735,21 @@ public class AuthoringTool {
             if(MouseMotionEvents.targetRectangle != null &&
                     primaryVideoLinkmapper.containsKey(primaryVideo.getFrameNum())){
                 Rect targetRect = MouseMotionEvents.targetRectangle;
-                targetRect.setSecondaryFrameNum(secondaryVideo.getFrameNum());
-                targetRect.setSecondaryVideoName(secondaryVideo.getVideoName());
-                System.out.println("targetRect: " + targetRect.cor1);
-                System.out.println("targetRect: " + targetRect.cor2);
-                System.out.println("targetRect: " + targetRect.getSecondaryFrameNum());
-                System.out.println("targetRect: " + targetRect.getSecondaryVideoName());
+                StringBuilder sb = new StringBuilder();
+                sb.append(targetRect.cor1);
+                sb.append(targetRect.cor2);
+                ArrayList<Rect> tempRectList = predictedRectMap.get(sb.toString());
+//                System.out.println(predictedRectMap);
+                Iterator<Rect> tempR = tempRectList.iterator();
+                while(tempR.hasNext()){
+                    Rect r = tempR.next();
+                    r.setSecondaryFrameNum(secondaryVideo.getFrameNum());
+                    r.setSecondaryVideoName(secondaryVideo.getVideoName());
+//                    System.out.println("Rect: " + r.cor1);
+//                    System.out.println("Rect: " + r.cor2);
+//                    System.out.println("Rect: " + r.getSecondaryFrameNum());
+//                    System.out.println("Rect: " + r.getSecondaryVideoName());
+                }
             }
             MouseMotionEvents.targetRectangle = null;
         });
