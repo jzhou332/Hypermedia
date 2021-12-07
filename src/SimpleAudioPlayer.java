@@ -81,15 +81,18 @@ public class SimpleAudioPlayer {
         clip.close();
     }
     // Method to jump over a specific part
-    public void jump(long c) throws UnsupportedAudioFileException, IOException,
-            LineUnavailableException {
+    public void jump(long c) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         if (c > 0 && c < clip.getMicrosecondLength()) {
             clip.stop();
             clip.close();
             resetAudioStream();
             currentFrame = c;
             clip.setMicrosecondPosition(c);
-            this.play();
+            clip.stop();
+            System.out.println("c: " + c);
+            System.out.println(clip.getMicrosecondLength());
+        } else {
+            System.out.println("didn't jump");
         }
     }
     // Method to reset audio stream

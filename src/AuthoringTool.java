@@ -474,7 +474,7 @@ public class AuthoringTool {
 
         // 创建一个滑块，最小值、最大值、初始值 分别为 0、20、10
         final JSlider slider1 = new JSlider(JSlider.HORIZONTAL,1, 9000, 1);
-        final JSlider slider2 = new JSlider(JSlider.HORIZONTAL,1, 30, 1);
+        final JSlider slider2 = new JSlider(JSlider.HORIZONTAL,1, 9000, 1);
 
         slider1.setPaintTicks(true);
         slider1.setPaintLabels(true);

@@ -38,7 +38,7 @@ public class Itimer_test extends JFrame {
     public static String imgsdir;
     //player counter
     public static int index = 0;
-    public static ImageIcon[] img = new ImageIcon[900];//声明数组用来存放要播放的图片
+    public static ImageIcon[] img = new ImageIcon[9000];//声明数组用来存放要播放的图片
     JLabel label;//声明为全局变量用来显示图片
     private javax.swing.Timer time;//声明的计数器
     private boolean istime;//用来标记自动播放 是否
@@ -50,8 +50,8 @@ public class Itimer_test extends JFrame {
     public static SimpleAudioPlayer audioPlayer;
     public static int isPlaying = -1;
 
-    static String parentPath = "/Users/aaronwenhaoge/Downloads";
-    static String videoName = "/AIFilmOne";
+    static String parentPath = "/Users/congkaizhou/Desktop";
+    static String videoName;
 //    static String videoPath = "/Users/aaronwenhaoge/Downloads/AIFilmOne/AIFilmOne";
     static String audioPath = new String();
 
@@ -59,7 +59,8 @@ public class Itimer_test extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        audioPath = "/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne.wav";
+        videoName = new String(args[0]);
+        audioPath = parentPath + "/" + videoName + "/" + videoName + ".wav";
         System.out.println(audioPath);
 
         readFile();
@@ -81,11 +82,24 @@ public class Itimer_test extends JFrame {
 
 
     }
+    public static Rect isJump(int x, int y, int index){
+        Rect ret = null;
+        if(primaryVideoLinkmapper.get(index) != null){
+            ArrayList<Rect> list = primaryVideoLinkmapper.get(index);
+            for(Rect a: list){
+                if(Rect.isInside(x, y, a)){
+                    ret = a;
+                    break;
+                }
+            }
 
+        }
+        return ret;
+    }
     private static void readFile() {
         //read from file
         try {
-            File toRead = new File(parentPath + videoName +"/primaryVideoLinkmapper.ser");
+            File toRead = new File(parentPath + "/" +videoName +"/primaryVideoLinkmapper.ser");
             FileInputStream fis=new FileInputStream(toRead);
             ObjectInputStream ois=new ObjectInputStream(fis);
 
@@ -94,12 +108,12 @@ public class Itimer_test extends JFrame {
             ois.close();
             fis.close();
             //print All data in MAP
-            for(Map.Entry<Integer, ArrayList<Rect>> e : primaryVideoLinkmapper.entrySet()){
-                System.out.println(e.getKey() + " : ");
-                for (Rect rect : e.getValue()) {
-                    rect.printPoints();
-                }
-            }
+//            for(Map.Entry<Integer, ArrayList<Rect>> e : primaryVideoLinkmapper.entrySet()){
+//                System.out.println(e.getKey() + " : ");
+//                for (Rect rect : e.getValue()) {
+//                    rect.printPoints();
+//                }
+//            }
         }  catch (IOException i) {
             primaryVideoLinkmapper = new HashMap<>();
             i.printStackTrace();
@@ -111,7 +125,7 @@ public class Itimer_test extends JFrame {
         }
 
         try {
-            File toRead = new File(parentPath + videoName +"/linkstoragemap.ser");
+            File toRead = new File(parentPath + "/" + videoName + "/linkstoragemap.ser");
             FileInputStream fis=new FileInputStream(toRead);
             ObjectInputStream ois=new ObjectInputStream(fis);
 
@@ -153,16 +167,35 @@ public class Itimer_test extends JFrame {
                     int xx = me.getX() - 5;
                     int yy = me.getY() - 30 - 24;
                     System.out.println("Mouse at "+xx+", " + yy + " " + "at frame " + (index+1));
+                    String jumpName = "";
+                    int jumpFrame = 0;
+//                    if(isJump(xx, yy, index) != null){
+//                        Rect jumprect =
+//                    }
+                    if(isJump(xx, yy, index) != null){
+                        Rect jumprect = isJump(xx, yy, index);
+                        String jumpVideoName =  jumprect.getSecondaryVideoName();
+                        int jumpVideoFrame = jumprect.getSecondaryFrameNum();
+                        videoName =  jumpVideoName;
+                        readFile();
+                        imgsdir = parentPath + "/" + jumpVideoName + "/" + jumpVideoName;
+                        audioPath = new String(parentPath + "/" + jumpVideoName + "/" + jumpVideoName + ".wav");
 
-                    if(true){
-                        imgsdir = "/Users/congkaizhou/Desktop/AIFilmTwo/AIFilmTwo";
-                        audioPath = new String("/Users/congkaizhou/Desktop/AIFilmTwo/AIFilmTwo.wav");
-
+                        try {
+                            audioPlayer.stop();
+                            isPlaying = -1;
+                        } catch (UnsupportedAudioFileException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (LineUnavailableException e) {
+                            e.printStackTrace();
+                        }
 
 
 //                        imgsdir = videoPath;
-                        index = 0;
-                        for(int i=0;i<900;i++){
+                        index = jumpVideoFrame;
+                        for(int i=index;i<9000;i++){
         
                             String OrgNumString = null;
                             if ((i+1) >= 1 && (i+1) < 10) {
@@ -184,20 +217,17 @@ public class Itimer_test extends JFrame {
                         time.stop();
                         istime=true;
                         label.setIcon(img[index]);
+
+
+
                         try {
                             audioPlayer.stop();
                             isPlaying = -1;
-                        } catch (UnsupportedAudioFileException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (LineUnavailableException e) {
-                            e.printStackTrace();
-                        }
-
-                        try {
-                            isPlaying = -1;
+                            audioPath = parentPath + "/"  + jumpVideoName + "/"  + jumpVideoName + ".wav";
                             audioPlayer = new SimpleAudioPlayer(audioPath);
+                            System.out.println("current: " + (double)index / (double) 9000);
+                            audioPlayer.jump((long) ((double)index / (double) 9000 * 300048253));
+
                         } catch (UnsupportedAudioFileException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
@@ -213,7 +243,7 @@ public class Itimer_test extends JFrame {
                     repaint();
                 }
             });
-        for(int i=0;i<900;i++){
+        for(int i=0;i<9000;i++){
         
             String OrgNumString = null;
             if ((i+1) >= 1 && (i+1) < 10) {
