@@ -736,6 +736,12 @@ public class AuthoringTool {
                 out.writeObject(primaryVideoLinkmapper);
                 out.close();
                 fileOut.close();
+                for(Map.Entry<Integer, ArrayList<Rect>> entry : primaryVideoLinkmapper.entrySet()){
+                    System.out.println(entry.getKey() + " : ");
+                    for (Rect rect : entry.getValue()) {
+                        rect.printPoints();
+                    }
+                }
                 System.out.println("Serialized data is saved in " + primaryVideo.getVideoPath() + "/primaryVideoLinkmapper.ser");
             } catch (IOException i) {
                 i.printStackTrace();
@@ -746,6 +752,12 @@ public class AuthoringTool {
                 out.writeObject(linkstoragemap);
                 out.close();
                 fileOut.close();
+//                for(Map.Entry<JTextField, int[]> entry : linkstoragemap.entrySet()){
+//                    for (int i : entry.getValue()) {
+//                        System.out.print(i + " ");
+//                    }
+//                    System.out.println();
+//                }
                 System.out.println("Serialized data is saved in " + primaryVideo.getVideoPath() + "/linkstoragemap.ser");
             } catch (IOException i) {
                 i.printStackTrace();

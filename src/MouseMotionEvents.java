@@ -95,7 +95,7 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
             ArrayList<Rect> list = new ArrayList<>();
             Rect rect = new Rect(p, r);
             list.add(rect);
-            rect.printPoints();
+//            rect.printPoints();
             AuthoringTool.primaryVideoLinkmapper.put(AuthoringTool.primary_frame_num, list);
         }else{
             AuthoringTool.primaryVideoLinkmapper.get(AuthoringTool.primary_frame_num).add(new Rect(p, r));
@@ -111,7 +111,7 @@ public class MouseMotionEvents extends JPanel implements MouseListener, MouseMot
             }
         }
         System.out.println("Frame number is "+AuthoringTool.primary_frame_num);
-        System.out.println("mouseReleased: " + r.getX()+", "+r.getY());
+//        System.out.println("mouseReleased: " + r.getX()+", "+r.getY());
 
 
         repaint();

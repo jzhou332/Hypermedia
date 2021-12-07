@@ -23,6 +23,9 @@ import java.awt.*;
 import javax.swing.border.*;
 import java.awt.event.MouseAdapter;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Itimer_test extends JFrame {
 
@@ -35,10 +38,15 @@ public class Itimer_test extends JFrame {
     private javax.swing.Timer time;//声明的计数器
     private boolean istime;//用来标记自动播放 是否
 
+    public static Map<Integer, ArrayList<Rect>> primaryVideoLinkmapper;
+    public static Map<JTextField, int[]> linkstoragemap;
+
     public static SourceDataLine line = null;
     public static SimpleAudioPlayer audioPlayer;
     public static int isPlaying = -1;
 
+    static String parentPath = "/Users/aaronwenhaoge/Downloads";
+    static String videoName = "/AIFilmOne";
     static String videoPath = "/Users/aaronwenhaoge/Downloads/AIFilmOne/AIFilmOne";
     static String audioPath = new String();
 
@@ -46,15 +54,17 @@ public class Itimer_test extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        audioPath = videoPath + ".wav";
+        audioPath = parentPath + videoName + videoName + ".wav";
         System.out.println(audioPath);
+
+        readFile();
 
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
 //                    Itimer_test frame = new Itimer_test("/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne");
 //                    Itimer_test frame = new Itimer_test(args[0]);
-                    Itimer_test frame = new Itimer_test(videoPath);
+                    Itimer_test frame = new Itimer_test(parentPath + videoName + videoName);
                     frame.setVisible(true);
 
                 } catch (Exception e) {
@@ -67,6 +77,49 @@ public class Itimer_test extends JFrame {
         audioPlayer.play();
     }
 
+    private static void readFile() {
+        //read from file
+        try {
+            File toRead = new File(parentPath + videoName +"/primaryVideoLinkmapper.ser");
+            FileInputStream fis=new FileInputStream(toRead);
+            ObjectInputStream ois=new ObjectInputStream(fis);
+
+            primaryVideoLinkmapper = (Map<Integer, ArrayList<Rect>>) ois.readObject();
+
+            ois.close();
+            fis.close();
+            //print All data in MAP
+            for(Map.Entry<Integer, ArrayList<Rect>> e : primaryVideoLinkmapper.entrySet()){
+                System.out.println(e.getKey() + " : ");
+                for (Rect rect : e.getValue()) {
+                    rect.printPoints();
+                }
+            }
+        } catch(Exception e) {
+
+        }
+
+        try {
+            File toRead = new File(parentPath + videoName +"/linkstoragemap.ser");
+            FileInputStream fis=new FileInputStream(toRead);
+            ObjectInputStream ois=new ObjectInputStream(fis);
+
+            linkstoragemap = (Map<JTextField, int[]>) ois.readObject();
+
+            ois.close();
+            fis.close();
+            //print All data in MAP
+//            for(Map.Entry<JTextField, int[]> e : linkstoragemap.entrySet()){
+//
+//                for (int i : e.getValue()) {
+//                    System.out.print(i + " ");
+//                }
+//                System.out.println();
+//            }
+        } catch(Exception e) {
+
+        }
+    }
 
     /**
      * Create the frame.
