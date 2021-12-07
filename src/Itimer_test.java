@@ -50,8 +50,9 @@ public class Itimer_test extends JFrame {
     public static SimpleAudioPlayer audioPlayer;
     public static int isPlaying = -1;
 
-    static String parentPath = "/Users/congkaizhou/Desktop";
-    static String videoName;
+    static String parentPath = "/Users/Yueting/Downloads/%576VideoSource";
+//    static String parentPath = new String();
+    static String videoName = new String();
 //    static String videoPath = "/Users/aaronwenhaoge/Downloads/AIFilmOne/AIFilmOne";
     static String audioPath = new String();
 
@@ -59,9 +60,10 @@ public class Itimer_test extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        videoName = new String(args[0]);
+//        parentPath = new String(args[0]);
+        videoName = new String(args[1]);
         audioPath = parentPath + "/" + videoName + "/" + videoName + ".wav";
-        System.out.println(audioPath);
+//        System.out.println(audioPath);
 
         readFile();
 
@@ -70,7 +72,8 @@ public class Itimer_test extends JFrame {
                 try {
 //                    Itimer_test frame = new Itimer_test("/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne");
 //                    Itimer_test frame = new Itimer_test(args[0]);
-                    Itimer_test frame = new Itimer_test("/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne");
+//                    Itimer_test frame = new Itimer_test("/Users/congkaizhou/Desktop/AIFilmOne/AIFilmOne");
+                    Itimer_test frame = new Itimer_test(parentPath + "/" + videoName + "/" + videoName);
                     frame.setVisible(true);
                     audioPlayer = new SimpleAudioPlayer(audioPath);
 
@@ -195,7 +198,7 @@ public class Itimer_test extends JFrame {
 
 //                        imgsdir = videoPath;
                         index = jumpVideoFrame;
-                        for(int i=index;i<9000;i++){
+                        for(int i=0;i<9000;i++){
         
                             String OrgNumString = null;
                             if ((i+1) >= 1 && (i+1) < 10) {
@@ -223,9 +226,10 @@ public class Itimer_test extends JFrame {
                         try {
                             audioPlayer.stop();
                             isPlaying = -1;
-                            audioPath = parentPath + "/"  + jumpVideoName + "/"  + jumpVideoName + ".wav";
+                            audioPath = new String(parentPath + "/"  + jumpVideoName + "/"  + jumpVideoName + ".wav");
+//                            System.out.println(audioPath);
                             audioPlayer = new SimpleAudioPlayer(audioPath);
-                            System.out.println("current: " + (double)index / (double) 9000);
+//                            System.out.println("current: " + (double)index / (double) 9000);
                             audioPlayer.jump((long) ((double)index / (double) 9000 * 300048253));
 
                         } catch (UnsupportedAudioFileException e) {

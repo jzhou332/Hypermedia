@@ -93,7 +93,7 @@ public class AuthoringTool {
 
         return y;
     }
-    //this ethod will do modifications to "primaryVideoLinkmapper"
+    //this method will do modifications to "primaryVideoLinkmapper"
     //frameNum是调用这个方法的当前的frameNumber
     public static void predictMiddleRect(Link a){
         Rect start = a.start;
@@ -535,6 +535,7 @@ public class AuthoringTool {
                     primaryVideoLinkmapper = new HashMap<>();
                     linkstoragemap = new HashMap<>();
 
+//                    + "/Downloads/%576VideoSource/"
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
@@ -649,6 +650,7 @@ public class AuthoringTool {
                     middleSliderPanelRight.revalidate();
                     middleSliderPanelRight.repaint();
 
+                    // + "/Downloads/%576VideoSource/"
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
@@ -728,10 +730,14 @@ public class AuthoringTool {
         //making the button's text editable
 
         connectButton.addActionListener((ActionEvent e) -> {
-            if (secondaryVideo == null) {
-                // TODO: if we didn't upload secondary video, we should do nothing
-                return;
+            if(primaryVideo.getVideoName() == null){
+                JOptionPane.showMessageDialog(null,"Please Load Primary Video");
+            } else if(secondaryVideo.getVideoName() == null){
+                JOptionPane.showMessageDialog(null,"Please Load Secondary Video");
+            } else if (MouseMotionEvents.targetRectangle == null) {
+                JOptionPane.showMessageDialog(null,"Please Create/Select a HyperLink");
             }
+
             if(MouseMotionEvents.targetRectangle != null &&
                     primaryVideoLinkmapper.containsKey(primaryVideo.getFrameNum())){
                 Rect targetRect = MouseMotionEvents.targetRectangle;
@@ -762,12 +768,12 @@ public class AuthoringTool {
                 out.writeObject(primaryVideoLinkmapper);
                 out.close();
                 fileOut.close();
-                for(Map.Entry<Integer, ArrayList<Rect>> entry : primaryVideoLinkmapper.entrySet()){
-                    System.out.println(entry.getKey() + " : ");
-                    for (Rect rect : entry.getValue()) {
-                        rect.printPoints();
-                    }
-                }
+//                for(Map.Entry<Integer, ArrayList<Rect>> entry : primaryVideoLinkmapper.entrySet()){
+//                    System.out.println(entry.getKey() + " : ");
+//                    for (Rect rect : entry.getValue()) {
+//                        rect.printPoints();
+//                    }
+//                }
                 System.out.println("Serialized data is saved in " + primaryVideo.getVideoPath() + "/primaryVideoLinkmapper.ser");
             } catch (IOException i) {
                 i.printStackTrace();

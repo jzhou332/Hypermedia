@@ -89,8 +89,6 @@ public class SimpleAudioPlayer {
             currentFrame = c;
             clip.setMicrosecondPosition(c);
             clip.stop();
-            System.out.println("c: " + c);
-            System.out.println(clip.getMicrosecondLength());
         } else {
             System.out.println("didn't jump");
         }
