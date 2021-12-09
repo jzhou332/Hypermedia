@@ -454,7 +454,7 @@ public class AuthoringTool {
         middleSliderPanelRight = new JPanel();
         middleSliderPanelRight.setPreferredSize(new Dimension(352, 62));
         
-        middleVideoPanelRight = new MouseMotionEvents(gLayout);
+        middleVideoPanelRight = new JPanel(gLayout);
         middleVideoPanelRight.setPreferredSize(new Dimension(352, 288));
 
         middlePanelRight.add(middleSliderPanelRight);
@@ -535,7 +535,6 @@ public class AuthoringTool {
                     primaryVideoLinkmapper = new HashMap<>();
                     linkstoragemap = new HashMap<>();
 
-//                    + "/Downloads/%576VideoSource/"
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
@@ -650,7 +649,6 @@ public class AuthoringTool {
                     middleSliderPanelRight.revalidate();
                     middleSliderPanelRight.repaint();
 
-                    // + "/Downloads/%576VideoSource/"
                     JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home"))); //Downloads Directory as default
                     int result = chooser.showSaveDialog(null);
                     if (result == JFileChooser.APPROVE_OPTION) {
@@ -756,6 +754,7 @@ public class AuthoringTool {
 //                    System.out.println("Rect: " + r.getSecondaryFrameNum());
 //                    System.out.println("Rect: " + r.getSecondaryVideoName());
                 }
+                System.out.println("Connected");
             }
             MouseMotionEvents.targetRectangle = null;
         });
